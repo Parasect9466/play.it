@@ -48,13 +48,11 @@ write_bin_set_wine() {
 	export WINEDEBUG
 	WINEDLLOVERRIDES='winemenubuilder.exe,mscoree,mshtml=d'
 	export WINEDLLOVERRIDES
-	WINEPREFIX="$XDG_DATA_HOME/play.it/prefixes/$PREFIX_ID"
+	WINEPREFIX="$PATH_PREFIX"
 	export WINEPREFIX
 	# Work around WINE bug 41639
 	FREETYPE_PROPERTIES="truetype:interpreter-version=35"
 	export FREETYPE_PROPERTIES
-
-	PATH_PREFIX="$WINEPREFIX/drive_c/$GAME_ID"
 
 	EOF
 }
@@ -65,8 +63,10 @@ write_bin_set_wine() {
 # CALLED BY: write_bin
 write_bin_build_wine() {
 	cat >> "$file" <<- 'EOF'
-	if ! [ -e "$WINEPREFIX" ]; then
-	  mkdir --parents "${WINEPREFIX%/*}"
+	# Build prefix
+	if ! [ -e "$WINEPREFIX/dosdevices" ]; then
+	  mkdir "$WINEPREFIX/dosdevices"
+	  ln -s .. "$WINEPREFIX/dosdevices/c:"
 	  # Use LANG=C to avoid localized directory names
 	  LANG=C wineboot --init 2>/dev/null
 	EOF
@@ -74,8 +74,7 @@ write_bin_build_wine() {
 	if ! { [ $version_major_target -lt 2 ] || [ $version_minor_target -lt 8 ] ; }; then
 		cat >> "$file" <<- 'EOF'
 		  # Remove most links pointing outside of the WINE prefix
-		  rm "$WINEPREFIX/dosdevices/z:"
-		  find "$WINEPREFIX/drive_c/users/$(whoami)" -type l | while read directory; do
+		  find "$WINEPREFIX/users/$(whoami)" -type l | while read directory; do
 		    rm "$directory"
 		    mkdir "$directory"
 		  done

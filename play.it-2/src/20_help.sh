@@ -155,9 +155,10 @@ help_compression() {
 
 # display --prefix option usage
 # USAGE: help_prefix
-# NEEDED VARS: (LANG)
+# NEEDED VARS: (LANG) (OPTION_PACKAGE)
 # CALLED BY: help
 help_prefix() {
+	local path_default
 	local string
 	local string_absolute
 	local string_default
@@ -178,7 +179,15 @@ help_prefix() {
 	printf -- '--prefix $path\n\n'
 	printf '\t%s\n\n' "$string"
 	printf '\t%s\n' "$string_absolute"
-	printf '\t%s /usr/local\n' "$string_default"
+	case "$OPTION_PACKAGE" in
+		('appdir')
+			path_default="$DEFAULT_OPTION_PREFIX_APPDIR"
+		;;
+		(*)
+			path_default="$DEFAULT_OPTION_PREFIX"
+		;;
+	esac
+	printf '\t%s %s\n' "$string_default" "$path_default"
 }
 
 # display --package option usage
@@ -187,26 +196,30 @@ help_prefix() {
 # CALLED BY: help
 help_package() {
 	local string
-	local string_default
+	local string_appdir
 	local string_arch
 	local string_deb
+	local string_default
 	case "${LANG%_*}" in
 		('fr')
 			string='Choix du type de paquet à construire'
 			string_default='(type par défaut)'
 			string_arch='paquet .pkg.tar (Arch Linux)'
 			string_deb='paquet .deb (Debian, Ubuntu)'
+			string_appdir='installation directe AppDir (toutes distributions) EXPÉRIMENTAL'
 		;;
 		('en'|*)
 			string='Generated package Type choice'
 			string_default='(default type)'
 			string_arch='.pkg.tar package (Arch Linux)'
 			string_deb='.deb package (Debian, Ubuntu)'
+			string_appdir='install to AppDir (distro-agnostic) EXPERIMENTAL'
 		;;
 	esac
-	printf -- '--package=arch|deb\n'
-	printf -- '--package arch|deb\n\n'
+	printf -- '--package=appdir|arch|deb\n'
+	printf -- '--package appdir|arch|deb\n\n'
 	printf '\t%s\n\n' "$string"
+	printf '\tappdir\t%s\n' "$string_appdir"
 	printf '\tarch\t%s' "$string_arch"
 	[ "$DEFAULT_OPTION_PACKAGE" = 'arch' ] && printf ' %s\n' "$string_default" || printf '\n'
 	printf '\tdeb\t%s' "$string_deb"

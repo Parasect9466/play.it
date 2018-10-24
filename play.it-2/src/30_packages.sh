@@ -3,6 +3,12 @@
 # NEEDED VARS: (ARCHIVE) GAME_NAME (OPTION_PACKAGE) PACKAGES_LIST (PKG_ARCH) PKG_DEPS_ARCH PKG_DEPS_DEB PKG_DESCRIPTION PKG_ID (PKG_PATH) PKG_PROVIDE
 # CALLS: liberror pkg_write_arch pkg_write_deb set_architecture testvar
 write_metadata() {
+	case "$OPTION_PACKAGE" in
+		('appdir')
+			return 0
+		;;
+	esac
+
 	if [ $# = 0 ]; then
 		write_metadata $PACKAGES_LIST
 		return 0
@@ -66,6 +72,10 @@ build_pkg() {
 		pkg_path="$(get_value "${pkg}_PATH")"
 		[ -n "$pkg_path" ] || missing_pkg_error 'build_pkg' "$PKG"
 		case $OPTION_PACKAGE in
+			('appdir')
+				# No package is built in AppDir mode
+				true
+			;;
 			('arch')
 				pkg_build_arch "$pkg_path"
 			;;
