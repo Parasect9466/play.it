@@ -193,3 +193,98 @@ error_launcher_missing_binary() {
 	return 1
 }
 
+# print integrity check message
+# USAGE: info_archive_integrity_check $file
+# CALLED BY: archive_integrity_check_md5
+info_archive_integrity_check() {
+	local file string
+	file="$1"
+	case "${LANG%_*}" in
+		('fr')
+			string='Contrôle de lʼintégrité de %s'
+		;;
+		('en'|*)
+			string='Checking integrity of %s'
+		;;
+	esac
+	printf "$string" "$(basename "$file")"
+}
+
+# print hash computation message
+# USAGE: info_archive_hash_computation $file
+info_archive_hash_computation() {
+	local file message
+	file="$1"
+	case "${LANG%_*}" in
+		('fr')
+			string='Calcul de la somme de contrôle de %s'
+		;;
+		('en'|*)
+			string='Computing hashsum for %s'
+		;;
+	esac
+	printf "$string" "$(basename "$file")"
+}
+
+# display an error message when an integrity check fails
+# USAGE: error_hashsum_mismatch $file
+error_hashsum_mismatch() {
+	local message file
+	file=$(basename "$1")
+	case "${LANG%_*}" in
+		('fr')
+			message='Somme de contrôle incohérente. %s nʼest pas le fichier attendu.\n'
+			message="$message"'Utilisez --checksum=none pour forcer son utilisation.\n'
+		;;
+		('en'|*)
+			message='Hashsum mismatch. %s is not the expected file.\n'
+			message="$message"'Use --checksum=none to force its use.\n'
+		;;
+	esac
+	print_error
+	printf "$message" "$file"
+	return 1
+}
+
+# display an error when a function has been given an unexpected empty string
+# USAGE: error_empty_string $function $string
+error_empty_string() {
+	local message function string
+	function="$1"
+	string="$2"
+	case "${LANG%_*}" in
+		('fr')
+			message='Lʼargument "%s" fourni à la fonction "%s" ne doit pas être vide.\n'
+			message="$message"'Merci de signaler cette erreur sur notre outil de gestion de bugs : %s\n'
+		;;
+		('en'|*)
+			message='Argument "%s" as provided to function "%s" can not be empty.\n'
+			message="$message"'Please report this issue in our bug tracker: %s\n'
+		;;
+	esac
+	print_error
+	printf "$message" "$string" "$function" "$PLAYIT_BUG_TRACKER_URL"
+	return 1
+}
+
+# display an error when a required command is missing, but a function was expecting it to be available
+# USAGE: error_unavailable_command $function $command
+error_unavailable_command() {
+	local message function command
+	function="$1"
+	command="$2"
+	case "${LANG%_*}" in
+		('fr')
+			message='La commande "%s" nʼest pas disponible, mais elle est requise par la fonction "%s".\n'
+			message="$message"'Merci de signaler cette erreur sur notre outil de gestion de bugs : %s\n'
+		;;
+		('en'|*)
+			message='"%s" command is not available, but it is required by function "%s".\n'
+			message="$message"'Please report this issue in our bug tracker: %s\n'
+		;;
+	esac
+	print_error
+	printf "$message" "$command" "$function" "$PLAYIT_BUG_TRACKER_URL"
+	return 1
+}
+
