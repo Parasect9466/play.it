@@ -35,7 +35,7 @@ set -o errexit
 # send your bug reports to contact@dotslashplay.it
 ###
 
-script_version=20200302.2
+script_version=20200302.4
 
 # Set game-specific variables
 
@@ -53,20 +53,19 @@ ARCHIVE_DOC_DATA_PATH='data'
 ARCHIVE_DOC_DATA_FILES='Linux.README'
 
 ARCHIVE_GAME_BIN32_PATH='data'
-ARCHIVE_GAME_BIN32_FILES='Proteus.bin.x86 lib/libmono-2.0.so.1 lib/libSDL2_mixer-2.0.so.0'
+ARCHIVE_GAME_BIN32_FILES='lib/libmono-2.0.so.1 lib/libSDL2_mixer-2.0.so.0'
 
 ARCHIVE_GAME_BIN64_PATH='data'
-ARCHIVE_GAME_BIN64_FILES='Proteus.bin.x86_64 lib64/libmono-2.0.so.1 lib64/libSDL2_mixer-2.0.so.0'
+ARCHIVE_GAME_BIN64_FILES='lib64/libmono-2.0.so.1 lib64/libSDL2_mixer-2.0.so.0'
 
 ARCHIVE_GAME_DATA_PATH='data'
 ARCHIVE_GAME_DATA_FILES='*.config *.dll *.exe resources Proteus.png mono'
 
-APP_MAIN_TYPE='native'
+APP_MAIN_TYPE='mono'
 # shellcheck disable=SC2016
 APP_MAIN_PRERUN='# Work around terminfo Mono bug, cf. https://github.com/mono/mono/issues/6752
 export TERM="${TERM%-256color}"'
-APP_MAIN_EXE_BIN32='Proteus.bin.x86'
-APP_MAIN_EXE_BIN64='Proteus.bin.x86_64'
+APP_MAIN_EXE='Proteus.exe'
 APP_MAIN_ICON='Proteus.png'
 
 PACKAGES_LIST='PKG_BIN32 PKG_BIN64 PKG_DATA'
@@ -75,7 +74,7 @@ PKG_DATA_ID="${GAME_ID}-data"
 PKG_DATA_DESCRIPTION='data'
 
 PKG_BIN32_ARCH='32'
-PKG_BIN32_DEPS="$PKG_DATA_ID glx xcursor glibc libstdc++ libxrandr sdl2 sdl2_image sdl2_mixer"
+PKG_BIN32_DEPS="$PKG_DATA_ID mono glx xcursor glibc libstdc++ libxrandr sdl2 sdl2_image sdl2_mixer"
 
 PKG_BIN64_ARCH='64'
 PKG_BIN64_DEPS="$PKG_BIN32_DEPS"
