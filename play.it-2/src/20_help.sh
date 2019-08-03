@@ -132,27 +132,39 @@ help_compression() {
 	local string_xz
 	case "${LANG%_*}" in
 		('fr')
-			string='Choix de la méthode de compression des paquets générés'
+			string='Choix de la méthode de compression des paquets générés (certaines options peuvent ne pas être disponible suivant le format de paquet choisi)'
 			string_none='pas de compression (méthode par défaut)'
 			string_gzip='compression gzip (rapide)'
 			string_xz='compression xz (plus lent mais plus efficace que gzip)'
-			string_bzip2='compression bzip2'
+			string_bzip2='compression bzip2 (plus rapide que xz pour la compression, mais moins efficace)'
+			string_zstd='compression zstd (fait pour être rapide, mais la vitesse et lʼefficacité dépendent du niveau de compression)'
+			string_lz4='compression lz4 (le plus rapide, mais aussi le plus lourd)'
+			string_lzip='compression lzip (similaire à xz)'
+			string_lzop='compression lzop (plus lent que lz4 pour la décompression mais plus efficace)'
 		;;
 		('en'|*)
-			string='Generated packages compression method choice'
+			string='Generated packages compression method choice (some options may not be available depending on the chosen package format)'
 			string_none='no compression (default method)'
 			string_gzip='gzip compression (fast)'
 			string_xz='xz compression (slower but more efficient than gzip)'
-			string_bzip2='bzip2 compression'
+			string_bzip2='bzip2 compression (faster than xz for compression but less efficient)'
+			string_zstd='zstd compression (designed to be fast, but speed and efficiency depends on compression level)'
+			string_lz4='lz4 compression (fastest, but biggest files)'
+			string_lzip='lzip compression (similar to xz)'
+			string_lzop='lzop compression (slower than lz4 at decompression but more efficient)'
 		;;
 	esac
-	printf -- '--compression=none|gzip|xz|bzip2\n'
-	printf -- '--compression none|gzip|xz|bzip2\n\n'
+	printf -- '--compression=none|gzip|xz|bzip2|zstd|lz4|lzip|lzop\n'
+	printf -- '--compression none|gzip|xz|bzip2|zstd|lz4|lzip|lzop\n\n'
 	printf '\t%s\n\n' "$string"
 	printf '\tnone\t%s\n' "$string_none"
 	printf '\tgzip\t%s\n' "$string_gzip"
 	printf '\txz\t%s\n' "$string_xz"
 	printf '\tbzip2\t%s\n' "$string_bzip2"
+	printf '\tzstd\t%s\n' "$string_zstd"
+	printf '\tlz4\t%s\n' "$string_lz4"
+	printf '\tlzip\t%s\n' "$string_lzip"
+	printf '\tlzop\t%s\n' "$string_lzop"
 }
 
 # display --prefix option usage

@@ -43,7 +43,11 @@ if [ "${0##*/}" != 'libplayit2.sh' ] && [ -z "$LIB_ONLY" ]; then
 	# shellcheck disable=SC2034
 	ALLOWED_VALUES_CHECKSUM='none md5'
 	# shellcheck disable=SC2034
-	ALLOWED_VALUES_COMPRESSION='none gzip xz bzip2'
+	ALLOWED_VALUES_COMPRESSION_DEB='none gzip xz'
+	# shellcheck disable=SC2034
+	ALLOWED_VALUES_COMPRESSION_ARCH='none gzip xz bzip2 zstd'
+	# shellcheck disable=SC2034
+	ALLOWED_VALUES_COMPRESSION_GENTOO='gzip xz bzip2 zstd lz4 lzip lzop'
 	# shellcheck disable=SC2034
 	ALLOWED_VALUES_PACKAGE='arch deb gentoo'
 
@@ -154,8 +158,10 @@ if [ "${0##*/}" != 'libplayit2.sh' ] && [ -z "$LIB_ONLY" ]; then
 
 	check_option_validity 'PACKAGE'
 
-	# Set default value for compression depending on the chosen package format
+	# Set allowed and default values for compression depending on the chosen package format
 
+	# shellcheck disable=SC2034
+	ALLOWED_VALUES_COMPRESSION="$(get_value "ALLOWED_VALUES_COMPRESSION_$(printf '%s' "$OPTION_PACKAGE" | tr '[:lower:]' '[:upper:]')")"
 	# shellcheck disable=SC2034
 	DEFAULT_OPTION_COMPRESSION="$(get_value "DEFAULT_OPTION_COMPRESSION_$(printf '%s' "$OPTION_PACKAGE" | tr '[:lower:]' '[:upper:]')")"
 
@@ -177,46 +183,6 @@ if [ "${0##*/}" != 'libplayit2.sh' ] && [ -z "$LIB_ONLY" ]; then
 	for option in 'CHECKSUM' 'COMPRESSION'; do
 		check_option_validity "$option"
 	done
-
-	# Do not allow bzip2 compression when building Debian packages
-
-	if
-		[ "$OPTION_PACKAGE" = 'deb' ] && \
-		[ "$OPTION_COMPRESSION" = 'bzip2' ]
-	then
-		print_error
-		case "${LANG%_*}" in
-			('fr')
-				# shellcheck disable=SC1112
-				string='Le mode de compression bzip2 n’est pas compatible avec la génération de paquets deb.'
-			;;
-			('en'|*)
-				string='bzip2 compression mode is not compatible with deb packages generation.'
-			;;
-		esac
-		printf '%s\n' "$string"
-		exit 1
-	fi
-
-	# Do not allow none compression when building Gentoo packages
-
-	if
-		[ "$OPTION_PACKAGE" = 'gentoo' ] && \
-		[ "$OPTION_COMPRESSION" = 'none' ]
-	then
-		print_error
-		case "${LANG%_*}" in
-			('fr')
-				# shellcheck disable=SC1112
-				string='Le mode de compression none n’est pas compatible avec la génération de paquets gentoo.'
-			;;
-			('en'|*)
-				string='none compression mode is not compatible with gentoo packages generation.'
-			;;
-		esac
-		printf '%s\n' "$string"
-		exit 1
-	fi
 
 	# Restrict packages list to target architecture
 
