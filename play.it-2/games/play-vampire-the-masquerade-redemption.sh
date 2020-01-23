@@ -34,7 +34,7 @@ set -o errexit
 # send your bug reports to contact@dotslashplay.it
 ###
 
-script_version=20200123.1
+script_version=20200123.2
 
 # Set game-specific variables
 
@@ -104,9 +104,8 @@ rm --recursive "$PLAYIT_WORKDIR/gamedata"
 
 # Extract icons
 
-PKG='PKG_BIN'
+PKG='PKG_DATA'
 icons_get_from_package 'APP_MAIN'
-move_icons_to 'PKG_DATA'
 
 # Write launchers
 
