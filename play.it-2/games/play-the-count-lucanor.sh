@@ -34,7 +34,7 @@ set -o errexit
 # send your bug reports to contact@dotslashplay.it
 ###
 
-script_version=20200205.1
+script_version=20200205.2
 
 # Set game-specific variables
 
@@ -70,9 +70,9 @@ APP_MAIN_ICON='lucanor.ico'
 PACKAGES_LIST='PKG_MAIN'
 
 PKG_MAIN_DEPS='java'
-PKG_MAIN_DEPS_ARCH='' #TODO
+PKG_MAIN_DEPS_ARCH='libva1'
 PKG_MAIN_DEPS_DEB='libva2 | libva1'
-PKG_MAIN_DEPS_GENTOO='' #TODO
+PKG_MAIN_DEPS_GENTOO='x11-libs/libva'
 
 # Load common functions
 
