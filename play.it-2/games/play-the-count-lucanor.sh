@@ -1,4 +1,4 @@
-#!/bin/sh -e
+#!/bin/sh
 set -o errexit
 
 ###
@@ -31,10 +31,10 @@ set -o errexit
 ###
 # The Count Lucanor
 # build native packages from the original installers
-# send your bug reports to vv221@dotslashplay.it
+# send your bug reports to contact@dotslashplay.it
 ###
 
-script_version=20190220.1
+script_version=20200205.1
 
 # Set game-specific variables
 
@@ -56,14 +56,13 @@ DATA_DIRS='./logs ./res/level ./res/db'
 
 APP_MAIN_TYPE='java'
 # shellcheck disable=SC2016
-APP_MAIN_PRERUN='
+APP_MAIN_PRERUN='# Ensure the game finds the libva.so.1 library it depends on
 if [ ! -e lib/libva.so.1 ]; then
 	library_file="$(/sbin/ldconfig --print-cache | awk -F " => " '\''/libva\.so/ {print $2}'\'' | head --lines=1)"
 	ln --force --symbolic "$library_file" lib/libva.so.1
 fi
 LD_LIBRARY_PATH="lib:$LD_LIBRARY_PATH"
-export LD_LIBRARY_PATH
-'
+export LD_LIBRARY_PATH'
 APP_MAIN_JAVA_OPTIONS='-Dfile.encoding=UTF-8 -Xmx1024m -Xms512m'
 APP_MAIN_EXE='lib/build-desktop.jar'
 APP_MAIN_ICON='lucanor.ico'
@@ -100,7 +99,7 @@ if [ -z "$PLAYIT_LIB2" ]; then
 	printf 'libplayit2.sh not found.\n'
 	exit 1
 fi
-#shellcheck source=play.it-2/lib/libplayit2.sh
+# shellcheck source=play.it-2/lib/libplayit2.sh
 . "$PLAYIT_LIB2"
 
 # Extract game data
@@ -115,7 +114,7 @@ icons_get_from_package 'APP_MAIN'
 
 # Write launchers
 
-launcher_write 'APP_MAIN'
+launchers_write 'APP_MAIN'
 
 # Build package
 
