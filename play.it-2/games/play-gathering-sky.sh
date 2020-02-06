@@ -1,4 +1,4 @@
-#!/bin/sh -e
+#!/bin/sh
 set -o errexit
 
 ###
@@ -35,7 +35,7 @@ set -o errexit
 # send your bug reports to mopi@dotslashplay.it
 ###
 
-script_version=20190120.3
+script_version=20200206.1
 
 # Set game-specific variables
 
@@ -52,8 +52,12 @@ ARCHIVE_HUMBLE_TYPE='zip_unclean'
 ARCHIVE_GAME_MAIN_PATH='packr/linux/GatheringSky'
 ARCHIVE_GAME_MAIN_FILES='desktop-0.1.jar'
 
+CONFIG_DIR="./home/.prefs"
+
 APP_MAIN_TYPE='java'
 APP_MAIN_JAVA_OPTIONS='-Xmx1G'
+APP_MAIN_PRERUN='# Ensure settings can be stored
+mkdir --parents "$HOME/.prefs"'
 APP_MAIN_EXE='desktop-0.1.jar'
 APP_MAIN_ICONS_LIST='APP_MAIN_ICON_16 APP_MAIN_ICON_32 APP_MAIN_ICON_128'
 APP_MAIN_ICON_16='images/Icon_16.png'
@@ -91,7 +95,7 @@ if [ -z "$PLAYIT_LIB2" ]; then
 	printf 'libplayit2.sh not found.\n'
 	exit 1
 fi
-#shellcheck source=play.it-2/lib/libplayit2.sh
+# shellcheck source=play.it-2/lib/libplayit2.sh
 . "$PLAYIT_LIB2"
 
 # Extract game data
