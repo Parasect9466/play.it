@@ -34,7 +34,7 @@ set -o errexit
 # send your bug reports to contact@dotslashplay.it
 ###
 
-script_version=20200212.3
+script_version=20200212.4
 
 # Set game-specific variables
 
@@ -86,16 +86,16 @@ PKG_DATA_DESCRIPTION='data'
 PKG_DATA_PROVIDE='torchlight-2-media'
 
 PKG_BIN32_ARCH='32'
-PKG_BIN32_DEPS="$PKG_DATA_ID glibc libstdc++ sdl2 freetype glx"
-PKG_BIN32_DEPS_ARCH='lib32-bzip2 lib32-libxft'
-PKG_BIN32_DEPS_DEB='libbz2-1.0, libxft2'
-PKG_BIN32_DEPS_GENTOO='app-arch/bzip2[abi_x86_32] x11-libs/libXft[abi_x86_32]'
+PKG_BIN32_DEPS="$PKG_DATA_ID glibc libstdc++ glx xcursor"
+PKG_BIN32_DEPS_ARCH='lib32-util-linux, lib32-bzip2 lib32-libxft'
+PKG_BIN32_DEPS_DEB='libuuid1, libbz2-1.0, libxft2, libogre-1.9.0v5'
+PKG_BIN32_DEPS_GENTOO='sys-apps/util-linux[abi_x86_32] app-arch/bzip2[abi_x86_32] x11-libs/libXft[abi_x86_32]'
 
 PKG_BIN64_ARCH='64'
 PKG_BIN64_DEPS="$PKG_BIN32_DEPS"
-PKG_BIN64_DEPS_ARCH='bzip2 libxft'
+PKG_BIN64_DEPS_ARCH='libutil-linux bzip2 libxft'
 PKG_BIN64_DEPS_DEB="$PKG_BIN32_DEPS_DEB"
-PKG_BIN64_DEPS_GENTOO='app-arch/bzip2 x11-libs/libXft'
+PKG_BIN64_DEPS_GENTOO='sys-apps/util-linux app-arch/bzip2 x11-libs/libXft'
 
 # Load common functions
 
