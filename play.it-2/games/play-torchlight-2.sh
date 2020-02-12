@@ -34,7 +34,7 @@ set -o errexit
 # send your bug reports to contact@dotslashplay.it
 ###
 
-script_version=20200212.1
+script_version=20200212.3
 
 # Set game-specific variables
 
@@ -69,29 +69,24 @@ ARCHIVE_GAME_BIN64_PATH_GOG='data/noarch/game'
 ARCHIVE_GAME_BIN64_PATH_HUMBLE='data/x86_64'
 ARCHIVE_GAME_BIN64_FILES='lib64 *.bin.x86_64'
 
-ARCHIVE_GAME_MEDIA_PATH_GOG='data/noarch/game'
-ARCHIVE_GAME_MEDIA_PATH_HUMBLE='data/noarch'
-ARCHIVE_GAME_MEDIA_FILES='movies music'
-
 ARCHIVE_GAME_DATA_PATH_GOG='data/noarch/game'
 ARCHIVE_GAME_DATA_PATH_HUMBLE='data/noarch'
-ARCHIVE_GAME_DATA_FILES='*.bmp *.cfg *.png icons PAKS porting programs'
+ARCHIVE_GAME_DATA_FILES='*.bmp *.cfg *.png icons movies music PAKS porting programs'
 
 APP_MAIN_TYPE='native'
 APP_MAIN_EXE_BIN32='Torchlight2.bin.x86'
 APP_MAIN_EXE_BIN64='Torchlight2.bin.x86_64'
 APP_MAIN_ICON='Delvers.png'
 
-PACKAGES_LIST='PKG_MEDIA PKG_DATA PKG_BIN32 PKG_BIN64'
-
-PKG_MEDIA_ID="${GAME_ID}-media"
-PKG_MEDIA_DESCRIPTION='movies & music'
+PACKAGES_LIST='PKG_DATA PKG_BIN32 PKG_BIN64'
 
 PKG_DATA_ID="${GAME_ID}-data"
 PKG_DATA_DESCRIPTION='data'
+# Easier upgrade from packages generated with pre-20200212.2 scripts
+PKG_DATA_PROVIDE='torchlight-2-media'
 
 PKG_BIN32_ARCH='32'
-PKG_BIN32_DEPS="$PKG_MEDIA_ID $PKG_DATA_ID glibc libstdc++ sdl2 freetype glx"
+PKG_BIN32_DEPS="$PKG_DATA_ID glibc libstdc++ sdl2 freetype glx"
 PKG_BIN32_DEPS_ARCH='lib32-bzip2 lib32-libxft'
 PKG_BIN32_DEPS_DEB='libbz2-1.0, libxft2'
 PKG_BIN32_DEPS_GENTOO='app-arch/bzip2[abi_x86_32] x11-libs/libXft[abi_x86_32]'
