@@ -34,7 +34,7 @@ set -o errexit
 # send your bug reports to contact@dotslashplay.it
 ###
 
-script_version=20200213.1
+script_version=20200213.2
 
 # Set game-specific variables
 
@@ -54,8 +54,9 @@ ARCHIVE_GAME_DATA_PATH='.'
 ARCHIVE_GAME_DATA_FILES='linux/main'
 
 APP_MAIN_TYPE='native'
+# shellcheck disable=SC2016
 APP_MAIN_PRERUN='# Run the game binary from its parent directory
-cd "$(dirname "$APP_EXE")
+cd "$(dirname "$APP_EXE")"
 APP_EXE=$(basename "$APP_EXE")'
 APP_MAIN_EXE='linux/main/binary/StrikeSuitZero'
 
