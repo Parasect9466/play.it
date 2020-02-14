@@ -34,7 +34,7 @@ set -o errexit
 # send your bug reports to contact@dotslashplay.it
 ###
 
-script_version=20200214.3
+script_version=20200214.4
 
 # Set game-specific variables
 
@@ -54,6 +54,7 @@ ARCHIVE_GAME_DATA_PATH='data/noarch/game'
 ARCHIVE_GAME_DATA_FILES='DXApp_* SOL_* Cinematic CSteamworks.bundle Manual Resources *.dx* *.fx *.glsl *.icns *.jx* *.sqlite *.suo *.ttf *.txt SOL'
 
 APP_MAIN_TYPE='native'
+APP_MAIN_LIBS='Linux/lib'
 APP_MAIN_EXE='LOXLinux'
 APP_MAIN_OPTIONS='--gc=sgen'
 APP_MAIN_ICON='LoX.exe'
