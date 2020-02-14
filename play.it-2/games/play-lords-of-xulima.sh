@@ -34,7 +34,7 @@ set -o errexit
 # send your bug reports to contact@dotslashplay.it
 ###
 
-script_version=20200214.4
+script_version=20200214.5
 
 # Set game-specific variables
 
@@ -55,6 +55,9 @@ ARCHIVE_GAME_DATA_FILES='DXApp_* SOL_* Cinematic CSteamworks.bundle Manual Resou
 
 APP_MAIN_TYPE='native'
 APP_MAIN_LIBS='Linux/lib'
+APP_MAIN_PRERUN='# Work around terminfo Mono bug
+# cf. https://github.com/mono/mono/issues/6752
+export TERM="${TERM%-256color}"'
 APP_MAIN_EXE='LOXLinux'
 APP_MAIN_OPTIONS='--gc=sgen'
 APP_MAIN_ICON='LoX.exe'
