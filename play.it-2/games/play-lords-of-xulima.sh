@@ -34,7 +34,7 @@ set -o errexit
 # send your bug reports to contact@dotslashplay.it
 ###
 
-script_version=20200214.2
+script_version=20200214.3
 
 # Set game-specific variables
 
@@ -58,7 +58,7 @@ APP_MAIN_EXE='LOXLinux'
 APP_MAIN_OPTIONS='--gc=sgen'
 APP_MAIN_ICON='LoX.exe'
 
-PACKAGES_LIST='PKG_BIN32 PKG_BIN64 PKG_DATA'
+PACKAGES_LIST='PKG_BIN PKG_DATA'
 
 PKG_DATA_ID="${GAME_ID}-data"
 PKG_DATA_DESCRIPTION='data'
