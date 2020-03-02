@@ -35,7 +35,7 @@ set -o errexit
 # send your bug reports to contact@dotslashplay.it
 ###
 
-script_version=20200302.1
+script_version=20200302.2
 
 # Set game-specific variables
 
@@ -72,21 +72,20 @@ ARCHIVE_DOC_DATA_FILES='Linux.README'
 
 ARCHIVE_GAME_BIN32_PATH_GOG='data/noarch/game'
 ARCHIVE_GAME_BIN32_PATH_HUMBLE='data'
-ARCHIVE_GAME_BIN32_FILES='Bastion.bin.x86 lib'
+ARCHIVE_GAME_BIN32_FILES='lib/libfmodex.so lib/libmojoshader.so lib/libsteam_api.so lib/libSteamWrapper.so'
 
 ARCHIVE_GAME_BIN64_PATH_GOG='data/noarch/game'
 ARCHIVE_GAME_BIN64_PATH_HUMBLE='data'
-ARCHIVE_GAME_BIN64_FILES='Bastion.bin.x86_64 lib64'
+ARCHIVE_GAME_BIN64_FILES='lib64/libfmodex.so lib64/libmojoshader.so lib64/libsteam_api.so lib64/libSteamWrapper.so'
 
 ARCHIVE_GAME_DATA_PATH_GOG='data/noarch/game'
 ARCHIVE_GAME_DATA_PATH_HUMBLE='data'
-ARCHIVE_GAME_DATA_FILES='*.config *.dll *.txt Bastion.exe Bastion.bmp Content mono*'
+ARCHIVE_GAME_DATA_FILES='*.config *.txt Bastion.exe Bastion.bmp Content mono* FMOD.dll FNA.dll Lidgren.Network.dll MojoShader.dll MonoGame.Framework.Net.dll'
 
-APP_MAIN_TYPE='native'
-# shellcheck disable=SC2016
-APP_MAIN_PRERUN='export TERM="${TERM%-256color}"'
-APP_MAIN_EXE_BIN32='Bastion.bin.x86'
-APP_MAIN_EXE_BIN64='Bastion.bin.x86_64'
+APP_MAIN_TYPE='mono'
+APP_MAIN_LIBS_BIN32='lib'
+APP_MAIN_LIBS_BIN64='lib64'
+APP_MAIN_EXE='Bastion.exe'
 APP_MAIN_ICON='Bastion.bmp'
 
 PACKAGES_LIST='PKG_BIN32 PKG_BIN64 PKG_DATA'
@@ -95,14 +94,20 @@ PKG_DATA_ID="${GAME_ID}-data"
 PKG_DATA_DESCRIPTION='data'
 
 PKG_BIN32_ARCH='32'
-PKG_BIN32_DEPS="$PKG_DATA_ID glibc libstdc++ sdl2 glx libudev1"
+PKG_BIN32_DEPS="$PKG_DATA_ID mono sdl2 glx libudev1"
+PKG_BIN32_DEPS_ARCH='' # TODO
+PKG_BIN32_DEPS_DEB='libmono-posix4.0-cil'
+PKG_BIN32_DEPS_GENTOO='' # TODO
 
 PKG_BIN64_ARCH='64'
 PKG_BIN64_DEPS="$PKG_BIN32_DEPS"
+PKG_BIN64_DEPS_ARCH='' # TODO
+PKG_BIN64_DEPS_DEB="$PKG_BIN32_DEPS_DEB"
+PKG_BIN64_DEPS_GENTOO='' # TODO
 
 # Load common functions
 
-target_version='2.11'
+target_version='2.12'
 
 if [ -z "$PLAYIT_LIB2" ]; then
 	: "${XDG_DATA_HOME:="$HOME/.local/share"}"
