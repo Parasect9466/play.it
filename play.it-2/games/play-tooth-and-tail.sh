@@ -1,9 +1,9 @@
-#!/bin/sh -e
+#!/bin/sh
 set -o errexit
 
 ###
-# Copyright (c) 2015-2019, Antoine Le Gonidec
-# Copyright (c) 2018-2019, BetaRays
+# Copyright (c) 2015-2020, Antoine "vv221/vv222" Le Gonidec
+# Copyright (c) 2018-2020, BetaRays
 # All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
@@ -31,11 +31,11 @@ set -o errexit
 
 ###
 # Tooth and Tail
-# build native Linux packages from the original installers
-# send your bug reports to vv221@dotslashplay.it
+# build native packages from the original installers
+# send your bug reports to contact@dotslashplay.it
 ###
 
-script_version=20190404.2
+script_version=20200302.4
 
 # Set game-specific variables
 
@@ -44,9 +44,8 @@ GAME_NAME='Tooth and Tail'
 
 ARCHIVE_HUMBLE='toothandtail_linux.zip'
 ARCHIVE_HUMBLE_MD5='a05d5b59d18c52c56e5ca52515002ed5'
-ARCHIVE_HUMBLE_VERSION='1.4.0.1-humble'
+ARCHIVE_HUMBLE_VERSION='1.4.0.1-humble1'
 ARCHIVE_HUMBLE_SIZE='600000'
-ARCHIVE_HUMBLE_TYPE='zip'
 
 ARCHIVE_GAME_LIBS32_PATH='.'
 ARCHIVE_GAME_LIBS32_FILES='lib/libfmod.so.10 lib/libfmodstudio.so.10 lib/libmojoshader.so lib/libtheorafile.so'
@@ -62,32 +61,30 @@ content'
 DATA_DIRS='logs'
 
 APP_MAIN_TYPE='mono'
+APP_MAIN_LIBS='lib'
 # shellcheck disable=SC2016
-APP_MAIN_PRERUN='
-LD_LIBRARY_PATH="$PWD/lib$(uname --machine | sed --regexp-extended '"'"'s/^x86_?//'"'"'):$LD_LIBRARY_PATH"
-export LD_LIBRARY_PATH'
+APP_MAIN_PRERUN='# Work around terminfo Mono bug, cf. https://github.com/mono/mono/issues/6752
+export TERM="${TERM%-256color}"'
 APP_MAIN_EXE='ToothAndTail.exe'
 APP_MAIN_ICON='ToothAndTail.exe'
 
 PACKAGES_LIST='PKG_MAIN PKG_LIBS32 PKG_LIBS64'
 
-PKG_MAIN_DEPS="$GAME_ID-libs"
+PKG_LIBS_ID="${GAME_ID}-libs"
 
 PKG_LIBS32_ARCH='32'
-PKG_LIBS32_ID="$GAME_ID-libs32"
-PKG_LIBS32_PROVIDE="$GAME_ID-libs"
-PKG_LIBS32_DEPS='mono openal sdl2 sdl2_image theora vorbis'
-PKG_LIBS32_DEPS_DEB='' #TODO
+PKG_LIBS32_ID="$PKG_LIBS_ID"
+PKG_LIBS32_DEPS='openal sdl2 sdl2_image theora vorbis'
 PKG_LIBS32_DEPS_ARCH='lib32-libjpeg6 lib32-libogg lib32-libpng15'
 PKG_LIBS32_DEPS_GENTOO='virtual/jpeg:62[abi_x86_32] media-libs/libogg[abi_x86_32] media-libs/libpng:1.5[abi_x86_32]'
 
 PKG_LIBS64_ARCH='64'
-PKG_LIBS64_ID="$GAME_ID-libs64"
-PKG_LIBS64_PROVIDE="$GAME_ID-libs"
+PKG_LIBS64_ID="$PKG_LIBS_ID"
 PKG_LIBS64_DEPS="$PKG_LIBS32_DEPS"
-PKG_LIBS64_DEPS_DEB="$PKG_LIBS32_DEPS_DEB"
 PKG_LIBS64_DEPS_ARCH='libjpeg6 libogg libpng15'
 PKG_LIBS64_DEPS_GENTOO="virtual/jpeg:62 media-libs/libogg media-libs/libpng:1.5"
+
+PKG_MAIN_DEPS="$GAME_ID-libs mono"
 
 # Load common functions
 
@@ -123,16 +120,19 @@ extract_data_from "$SOURCE_ARCHIVE"
 prepare_package_layout
 rm --recursive "$PLAYIT_WORKDIR/gamedata"
 
+# Make multiple architectures easier to handle
+
+mv "${PKG_LIBS64_PATH}${PATH_GAME}/lib64" "${PKG_LIBS64_PATH}${PATH_GAME}/lib"
+
+# Get game icon
+
+PKG='PKG_MAIN'
+icons_get_from_package 'APP_MAIN'
+
 # Write launchers
 
 PKG='PKG_MAIN'
-write_launcher 'APP_MAIN'
-
-# Fix a crash when starting from some terminals
-
-# shellcheck disable=SC2016
-pattern='s#^mono .* "$APP_EXE" .*#& > ./logs/$(date +%F-%R).log#'
-sed --in-place "$pattern" "${PKG_MAIN_PATH}${PATH_BIN}/$GAME_ID"
+launchers_write 'APP_MAIN'
 
 # Build package
 
