@@ -35,7 +35,7 @@ set -o errexit
 # send your bug reports to contact@dotslashplay.it
 ###
 
-script_version=20200302.4
+script_version=20200302.5
 
 # Set game-specific variables
 
@@ -47,44 +47,35 @@ ARCHIVE_HUMBLE_MD5='a05d5b59d18c52c56e5ca52515002ed5'
 ARCHIVE_HUMBLE_VERSION='1.4.0.1-humble1'
 ARCHIVE_HUMBLE_SIZE='600000'
 
-ARCHIVE_GAME_LIBS32_PATH='.'
-ARCHIVE_GAME_LIBS32_FILES='lib/libfmod.so.10 lib/libfmodstudio.so.10 lib/libmojoshader.so lib/libtheorafile.so'
+ARCHIVE_GAME_BIN32_PATH='.'
+ARCHIVE_GAME_BIN32_FILES='lib/libmojoshader.so lib/libtheorafile.so'
 
-ARCHIVE_GAME_LIBS64_PATH='.'
-ARCHIVE_GAME_LIBS64_FILES='lib64/libfmod.so.10 lib64/libfmodstudio.so.10 lib64/libmojoshader.so lib64/libtheorafile.so'
+ARCHIVE_GAME_BIN64_PATH='.'
+ARCHIVE_GAME_BIN64_FILES='lib64/libfmod.so.10 lib64/libfmodstudio.so.10 lib64/libmojoshader.so lib64/libtheorafile.so'
 
-ARCHIVE_GAME_MAIN_PATH='.'
-ARCHIVE_GAME_MAIN_FILES='
-*.dll *.exe *config fr/*.dll
-content'
-
-DATA_DIRS='logs'
+ARCHIVE_GAME_DATA_PATH='.'
+ARCHIVE_GAME_DATA_FILES='*.dll *.exe *config fr/*.dll content'
 
 APP_MAIN_TYPE='mono'
-APP_MAIN_LIBS='lib'
-# shellcheck disable=SC2016
-APP_MAIN_PRERUN='# Work around terminfo Mono bug, cf. https://github.com/mono/mono/issues/6752
-export TERM="${TERM%-256color}"'
+APP_MAIN_LIBS_BIN32='lib'
+APP_MAIN_LIBS_BIN64='lib64'
 APP_MAIN_EXE='ToothAndTail.exe'
 APP_MAIN_ICON='ToothAndTail.exe'
 
-PACKAGES_LIST='PKG_MAIN PKG_LIBS32 PKG_LIBS64'
+PACKAGES_LIST='PKG_DATA PKG_BIN32 PKG_BIN64'
 
-PKG_LIBS_ID="${GAME_ID}-libs"
+PKG_DATA_ID="${GAME_ID}-data"
+PKG_DATA_DESCRIPTION='data'
 
-PKG_LIBS32_ARCH='32'
-PKG_LIBS32_ID="$PKG_LIBS_ID"
-PKG_LIBS32_DEPS='openal sdl2 sdl2_image theora vorbis'
-PKG_LIBS32_DEPS_ARCH='lib32-libjpeg6 lib32-libogg lib32-libpng15'
-PKG_LIBS32_DEPS_GENTOO='virtual/jpeg:62[abi_x86_32] media-libs/libogg[abi_x86_32] media-libs/libpng:1.5[abi_x86_32]'
+PKG_BIN32_ARCH='32'
+PKG_BIN32_DEPS="$PKG_DATA mono openal sdl2 sdl2_image theora vorbis"
+PKG_BIN32_DEPS_ARCH='lib32-libjpeg6 lib32-libogg lib32-libpng15'
+PKG_BIN32_DEPS_GENTOO='virtual/jpeg:62[abi_x86_32] media-libs/libogg[abi_x86_32] media-libs/libpng:1.5[abi_x86_32]'
 
-PKG_LIBS64_ARCH='64'
-PKG_LIBS64_ID="$PKG_LIBS_ID"
-PKG_LIBS64_DEPS="$PKG_LIBS32_DEPS"
-PKG_LIBS64_DEPS_ARCH='libjpeg6 libogg libpng15'
-PKG_LIBS64_DEPS_GENTOO="virtual/jpeg:62 media-libs/libogg media-libs/libpng:1.5"
-
-PKG_MAIN_DEPS="$GAME_ID-libs mono"
+PKG_BIN64_ARCH='64'
+PKG_BIN64_DEPS="$PKG_BIN32_DEPS"
+PKG_BIN64_DEPS_ARCH='libjpeg6 libogg libpng15'
+PKG_BIN64_DEPS_GENTOO="virtual/jpeg:62 media-libs/libogg media-libs/libpng:1.5"
 
 # Load common functions
 
@@ -120,19 +111,16 @@ extract_data_from "$SOURCE_ARCHIVE"
 prepare_package_layout
 rm --recursive "$PLAYIT_WORKDIR/gamedata"
 
-# Make multiple architectures easier to handle
-
-mv "${PKG_LIBS64_PATH}${PATH_GAME}/lib64" "${PKG_LIBS64_PATH}${PATH_GAME}/lib"
-
 # Get game icon
 
-PKG='PKG_MAIN'
+PKG='PKG_DATA'
 icons_get_from_package 'APP_MAIN'
 
 # Write launchers
 
-PKG='PKG_MAIN'
-launchers_write 'APP_MAIN'
+for PKG in 'PKG_BIN32' 'PKG_BIN64'; do
+	launchers_write 'APP_MAIN'
+done
 
 # Build package
 
