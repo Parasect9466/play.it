@@ -35,7 +35,7 @@ set -o errexit
 # send your bug reports to contact@dotslashplay.it
 ###
 
-script_version=20200302.1
+script_version=20200302.2
 
 # Set game-specific variables
 
@@ -79,7 +79,7 @@ PKG_BIN64_DEPS="$PKG_BIN32_DEPS"
 
 # Load common functions
 
-target_version='2.11'
+target_version='2.12'
 
 if [ -z "$PLAYIT_LIB2" ]; then
 	: "${XDG_DATA_HOME:="$HOME/.local/share"}"
@@ -125,18 +125,15 @@ done
 # Build package
 
 manual='TIS-100 Reference Manual.pdf'
-cat >> "$postinst" << EOF
-if [ ! -e "$PATH_GAME/$manual" ]; then
-	ln --symbolic "$PATH_DOC/$manual" "$PATH_GAME"
-fi
-EOF
-cat >> "$prerm" << EOF
-if [ -e "$PATH_GAME/$manual" ]; then
-	rm "$PATH_GAME/$manual"
-fi
-EOF
-write_metadata 'PKG_DATA'
-write_metadata 'PKG_BIN32' 'PKG_BIN64'
+PKG_DATA_POSTINST_RUN="# Link reference manual to game directory
+if [ ! -e '$PATH_GAME/$manual' ]; then
+	ln --symbolic '$PATH_DOC/$manual' '$PATH_GAME'
+fi"
+PKG_DATA_PRERM_RUN="# Remove link to reference manual from game directory
+if [ -e '$PATH_GAME/$manual' ]; then
+	rm '$PATH_GAME/$manual'
+fi"
+write_metadata
 build_pkg
 
 # Clean up
