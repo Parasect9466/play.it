@@ -2,8 +2,8 @@
 set -o errexit
 
 ###
-# Copyright (c) 2015-2018, Antoine Le Gonidec
-# Copyright (c) 2018, BetaRays
+# Copyright (c) 2015-2020, Antoine "vv221/vv222" Le Gonidec
+# Copyright (c) 2018-2020, BetaRays
 # All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
@@ -31,37 +31,37 @@ set -o errexit
 
 ###
 # Yume Nikki
-# build native Linux packages from the original installers
-# send your bug reports to vv221@dotslashplay.it
+# build native packages from the original installers
+# send your bug reports to contact@dotslashplay.it
 ###
 
-script_version=20190419.1
+script_version=20200302.1
 
 # Set game-specific variables
 
 GAME_ID='yume-nikki'
 GAME_NAME='Yume Nikki'
 
-SCRIPT_DEPS='iconv convmv lzh' # lzh is needed for the inner archive
+SCRIPT_DEPS='iconv convmv lha'
 
 ARCHIVE_PLAYISM='YumeNikki_EN.zip'
-ARCHIVE_PLAYISM_URL='http://playism-games.com/game/20/yume-nikki'
+ARCHIVE_PLAYISM_URL='https://playism.com/product/yumenikki'
 ARCHIVE_PLAYISM_MD5='fd1e659f777ad81bd61ebd6df573140e'
 ARCHIVE_PLAYISM_VERSION='0.10a-playism'
 ARCHIVE_PLAYISM_SIZE='66000'
-ARCHIVE_PLAYISM_TYPE='zip'
 
 ARCHIVE_DOC_DATA_PATH='YumeNikki_EN'
-ARCHIVE_DOC_DATA_FILES='./*.txt'
+ARCHIVE_DOC_DATA_FILES='*.txt'
 
 ARCHIVE_GAME_BIN_PATH='.'
-ARCHIVE_GAME_BIN_FILES='./RPG_RT.* ./Harmony.dll'
+ARCHIVE_GAME_BIN_FILES='RPG_RT.* Harmony.dll'
 
 ARCHIVE_GAME_DATA_PATH='.'
-ARCHIVE_GAME_DATA_FILES='./CharSet ./Panorama ./Picture ./BattleWeapon ./Movie ./ChipSet ./System2 ./Sound ./FaceSet ./System ./Title ./Monster ./Battle2 ./Backdrop ./BattleCharSet ./GameOver ./Music ./Frame ./Battle ./Map*.lmu'
+ARCHIVE_GAME_DATA_FILES='CharSet Panorama Picture BattleWeapon Movie ChipSet System2 Sound FaceSet System Title Monster Battle2 Backdrop BattleCharSet GameOver Music Frame Battle Map*.lmu'
 
 APP_MAIN_TYPE='wine'
-APP_MAIN_PRERUN='export LC_ALL=ja_JP.UTF-8'
+APP_MAIN_PRERUN='# Japanese locale is required for correct fonts display
+export LC_ALL=ja_JP.UTF-8'
 APP_MAIN_EXE='RPG_RT.exe'
 APP_MAIN_ICON='RPG_RT.exe'
 
@@ -79,61 +79,60 @@ PKG_BIN_POSTINST_WARN='You may need to generate the ja_JP.UTF-8 locale to play t
 
 # Load common functions
 
-target_version='2.10'
+target_version='2.12'
 
 if [ -z "$PLAYIT_LIB2" ]; then
-	[ -n "$XDG_DATA_HOME" ] || XDG_DATA_HOME="$HOME/.local/share"
+	: "${XDG_DATA_HOME:="$HOME/.local/share"}"
 	for path in\
-		'./'\
-		"$XDG_DATA_HOME/play.it/"\
-		"$XDG_DATA_HOME/play.it/play.it-2/lib/"\
-		'/usr/local/share/games/play.it/'\
-		'/usr/local/share/play.it/'\
-		'/usr/share/games/play.it/'\
-		'/usr/share/play.it/'
+		"$PWD"\
+		"$XDG_DATA_HOME/play.it"\
+		'/usr/local/share/games/play.it'\
+		'/usr/local/share/play.it'\
+		'/usr/share/games/play.it'\
+		'/usr/share/play.it'
 	do
-		if [ -z "$PLAYIT_LIB2" ] && [ -e "$path/libplayit2.sh" ]; then
+		if [ -e "$path/libplayit2.sh" ]; then
 			PLAYIT_LIB2="$path/libplayit2.sh"
 			break
 		fi
 	done
-	if [ -z "$PLAYIT_LIB2" ]; then
-		printf '\n\033[1;31mError:\033[0m\n'
-		printf 'libplayit2.sh not found.\n'
-		exit 1
-	fi
 fi
-#shellcheck source=play.it-2/lib/libplayit2.sh
+if [ -z "$PLAYIT_LIB2" ]; then
+	printf '\n\033[1;31mError:\033[0m\n'
+	printf 'libplayit2.sh not found.\n'
+	exit 1
+fi
+# shellcheck source=play.it-2/lib/libplayit2.sh
 . "$PLAYIT_LIB2"
 
 # Extract game data
 
 extract_data_from "$SOURCE_ARCHIVE"
-
-# Convert the text files to UTF-8 encoding
-
-for file in "$PLAYIT_WORKDIR/gamedata/$ARCHIVE_DOC_DATA_PATH"/*.txt
-do
-	contents="$(iconv --from-code SHIFT-JIS --to-code UTF-8 "$file")"
-	printf '%s' "$contents" > "$file"
-done
-sed -i 's/¥/\\/g' "$PLAYIT_WORKDIR/gamedata/$ARCHIVE_DOC_DATA_PATH/YumeNikkiREADME.txt" # Fix windows paths
-
-(
-        ARCHIVE='INNER_ARCHIVE'
-        INNER_ARCHIVE="$PLAYIT_WORKDIR/gamedata/YumeNikki_EN/YumeNikki.lzh"
-        INNER_ARCHIVE_TYPE='lzh'
-        extract_data_from "$INNER_ARCHIVE"
-        rm "$INNER_ARCHIVE"
-)
-
-# Convert the file names to UTF-8 encoding
-
-find "$PLAYIT_WORKDIR/gamedata" -exec convmv --notest -f SHIFT-JIS -t UTF-8 {} + >/dev/null 2>/dev/null
-
+INNER_ARCHIVE="$PLAYIT_WORKDIR/gamedata/YumeNikki_EN/YumeNikki.lzh"
+INNER_ARCHIVE_TYPE='lha'
+ARCHIVE='INNER_ARCHIVE' \
+	extract_data_from "$INNER_ARCHIVE"
+rm "$INNER_ARCHIVE"
+# Convert the files names to UTF-8 encoding
+find "$PLAYIT_WORKDIR/gamedata" -exec \
+	convmv --notest -f SHIFT-JIS -t UTF-8 {} + >/dev/null 2>/dev/null
 prepare_package_layout
-
 rm --recursive "$PLAYIT_WORKDIR/gamedata"
+
+# Fix Windows-style paths
+
+pattern='s/¥/\\/g'
+file="${PKG_DATA_PATH}${PATH_DOC}/YumeNikkiREADME.txt"
+sed --in-place "$pattern" "$file"
+
+# Convert the text files contents to UTF-8 encoding
+
+# shellcheck disable=SC2016
+shell_command='contents=$(iconv --from-code CP932 --to-code UTF-8 "$1")'
+# shellcheck disable=SC2016
+shell_command="$shell_command"'; printf "%s" "$contents" > "$1"'
+find "${PKG_DATA_PATH}${PATH_DOC}" -name '*.txt' -exec \
+	sh -c "$shell_command" -- '{}' \;
 
 # Extract game icons
 
@@ -144,12 +143,11 @@ icons_move_to 'PKG_DATA'
 # Write launchers
 
 PKG='PKG_BIN'
-write_launcher 'APP_MAIN'
+launchers_write 'APP_MAIN'
 
 # Build package
 
-write_metadata 'PKG_DATA'
-write_metadata 'PKG_BIN'
+write_metadata
 build_pkg
 
 # Clean up
