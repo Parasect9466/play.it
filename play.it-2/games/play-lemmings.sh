@@ -35,7 +35,7 @@ set -o errexit
 # send your bug reports to contact@dotslashplay.it
 ###
 
-script_version=20200303.1
+script_version=20200303.3
 
 # Set game-specific variables
 
@@ -57,8 +57,10 @@ ARCHIVE_DOC0_MAIN_FILES='*.txt'
 ARCHIVE_DOC1_MAIN_PATH='lem'
 ARCHIVE_DOC1_MAIN_FILES='*.doc'
 
+DATA_FILES='./RUSSELL.DAT'
+
 APP_MAIN_TYPE='dosbox'
-APP_MAIN_EXE='lemmings.bat'
+APP_MAIN_EXE='LEMMINGS.BAT'
 
 PACKAGES_LIST='PKG_MAIN'
 
@@ -66,7 +68,7 @@ PKG_MAIN_DEPS='dosbox'
 
 # Load common functions
 
-target_version='2.11'
+target_version='2.12'
 
 if [ -z "$PLAYIT_LIB2" ]; then
 	: "${XDG_DATA_HOME:="$HOME/.local/share"}"
@@ -98,6 +100,13 @@ extract_data_from "$SOURCE_ARCHIVE"
 tolower "$PLAYIT_WORKDIR/gamedata"
 prepare_package_layout
 rm --recursive "$PLAYIT_WORKDIR/gamedata"
+toupper "${PKG_MAIN_PATH}${PATH_GAME}"
+
+# Automatically exit DOSBox when closing the game
+
+sed --in-place \
+	's/:finish/&\nexit/' \
+	"${PKG_MAIN_PATH}${PATH_GAME}/LEMMINGS.BAT"
 
 # Write launchers
 
