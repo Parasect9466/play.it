@@ -148,7 +148,7 @@ launcher_write_script_wine_prefix_build() {
 	    done
 	)
 	if [ -n "$APP_WINE_USER_CONFIG" ]; then
-	    CONFIG_DIRS="$CONFIG_DIRS userconfig"
+	    CONFIG_DIRS="$CONFIG_DIRS ./userconfig"
 	    user_config_path="$WINEPREFIX/drive_c/users/$(whoami)/$APP_WINE_USER_CONFIG"
 	    if [ ! -e "$user_config_path" ]; then
 	        mkdir --parents "$(dirname "$user_config_path")"
@@ -157,7 +157,7 @@ launcher_write_script_wine_prefix_build() {
 	    fi
 	fi
 	if [ -n "$APP_WINE_USER_DATA" ]; then
-	    DATA_DIRS="$DATA_DIRS userdata"
+	    DATA_DIRS="$DATA_DIRS ./userdata"
 	    user_data_path="$WINEPREFIX/drive_c/users/$(whoami)/$APP_WINE_USER_DATA"
 	    if [ ! -e "$user_data_path" ]; then
 	        mkdir --parents "$(dirname "$user_data_path")"
@@ -166,7 +166,7 @@ launcher_write_script_wine_prefix_build() {
 	    fi
 	fi
 	if [ -n "$APP_WINE_PUBLIC_CONFIG" ]; then
-	    CONFIG_DIRS="$CONFIG_DIRS publicconfig"
+	    CONFIG_DIRS="$CONFIG_DIRS ./publicconfig"
 	    public_config_path="$WINEPREFIX/drive_c/users/Public/$APP_WINE_PUBLIC_CONFIG"
 	    if [ ! -e "$public_config_path" ]; then
 	        mkdir --parents "$(dirname "$public_config_path")"
@@ -175,7 +175,7 @@ launcher_write_script_wine_prefix_build() {
 	    fi
 	fi
 	if [ -n "$APP_WINE_PUBLIC_DATA" ]; then
-	    DATA_DIRS="$DATA_DIRS publicdata"
+	    DATA_DIRS="$DATA_DIRS ./publicdata"
 	    public_data_path="$WINEPREFIX/drive_c/users/Public/$APP_WINE_PUBLIC_DATA"
 	    if [ ! -e "$public_data_path" ]; then
 	        mkdir --parents "$(dirname "$public_data_path")"
