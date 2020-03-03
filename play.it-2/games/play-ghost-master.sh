@@ -34,7 +34,7 @@ set -o errexit
 # send your bug reports to contact@dotslashplay.it
 ###
 
-script_version=20200303.1
+script_version=20200303.2
 
 # Set game-specific variables
 
@@ -123,6 +123,7 @@ PKG='PKG_BIN'
 launchers_write 'APP_MAIN'
 
 # Store saved games outside of WINE prefix
+# This is broken as of ./play.it 2.11
 
 for file in "${PKG_BIN_PATH}${PATH_BIN}"/*; do
 	# shellcheck disable=SC2016
