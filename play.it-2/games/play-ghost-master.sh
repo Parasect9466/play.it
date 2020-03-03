@@ -1,4 +1,4 @@
-#!/bin/sh -e
+#!/bin/sh
 set -o errexit
 
 ###
@@ -29,19 +29,17 @@ set -o errexit
 ###
 
 ###
-# GHost Master
-# build native Linux packages from the original installers
-# send your bug reports to vv221@dotslashplay.it
+# Ghost Master
+# build native packages from the original installers
+# send your bug reports to contact@dotslashplay.it
 ###
 
-script_version=20180224.1
+script_version=20200303.1
 
 # Set game-specific variables
 
 GAME_ID='ghost-master'
 GAME_NAME='Ghost Master'
-
-ARCHIVES_LIST='ARCHIVE_GOG ARCHIVE_GOG_OLD'
 
 ARCHIVE_GOG='setup_ghost_master_20171020_(15806).exe'
 ARCHIVE_GOG_URL='https://www.gog.com/game/ghost_master'
@@ -49,19 +47,19 @@ ARCHIVE_GOG_MD5='bbc7b8d6ed9b08c54cba6f2b1048a0fd'
 ARCHIVE_GOG_SIZE='680000'
 ARCHIVE_GOG_VERSION='1.1-gog15806'
 
-ARCHIVE_GOG_OLD='setup_ghost_master_2.0.0.3.exe'
-ARCHIVE_GOG_OLD_MD5='f581e0e08d7d9dfc89838c3ac892611a'
-ARCHIVE_GOG_OLD_SIZE='650000'
-ARCHIVE_GOG_OLD_VERSION='1.1-gog2.0.0.3'
+ARCHIVE_GOG_OLD0='setup_ghost_master_2.0.0.3.exe'
+ARCHIVE_GOG_OLD0_MD5='f581e0e08d7d9dfc89838c3ac892611a'
+ARCHIVE_GOG_OLD0_SIZE='650000'
+ARCHIVE_GOG_OLD0_VERSION='1.1-gog2.0.0.3'
 
 ARCHIVE_DOC_DATA_PATH='app'
-ARCHIVE_DOC_DATA_FILES='./*.pdf ./*.txt'
+ARCHIVE_DOC_DATA_FILES='*.pdf *.txt'
 
 ARCHIVE_GAME_BIN_PATH='app/ghostdata'
-ARCHIVE_GAME_BIN_FILES='./*.cfg ./*.dll ./*.exe'
+ARCHIVE_GAME_BIN_FILES='*.cfg *.dll *.exe'
 
 ARCHIVE_GAME_DATA_PATH='app/ghostdata'
-ARCHIVE_GAME_DATA_FILES='./*.txt ./characters ./cursors ./fonts ./icons ./levels ./movies ./music ./new_animations ./otherobjects ./psparams ./pstextures ./scenarios ./screenshots ./scripts ./sound ./text ./ui ./voice'
+ARCHIVE_GAME_DATA_FILES='*.txt characters cursors fonts icons levels movies music new_animations otherobjects psparams pstextures scenarios screenshots scripts sound text ui voice'
 
 CONFIG_FILES='./*.cfg'
 DATA_DIRS='./screenshots'
@@ -70,7 +68,6 @@ DATA_FILES='./*.log'
 APP_MAIN_TYPE='wine'
 APP_MAIN_EXE='ghost.exe'
 APP_MAIN_ICON='ghost.exe'
-APP_MAIN_ICON_RES='16 32 48'
 
 PACKAGES_LIST='PKG_DATA PKG_BIN'
 
@@ -82,42 +79,48 @@ PKG_BIN_DEPS="$PKG_DATA_ID wine"
 
 # Load common functions
 
-target_version='2.2'
+target_version='2.11'
 
 if [ -z "$PLAYIT_LIB2" ]; then
-	[ -n "$XDG_DATA_HOME" ] || XDG_DATA_HOME="$HOME/.local/share"
-	if [ -e "$XDG_DATA_HOME/play.it/play.it-2/lib/libplayit2.sh" ]; then
-		PLAYIT_LIB2="$XDG_DATA_HOME/play.it/play.it-2/lib/libplayit2.sh"
-	elif [ -e './libplayit2.sh' ]; then
-		PLAYIT_LIB2='./libplayit2.sh'
-	else
-		printf '\n\033[1;31mError:\033[0m\n'
-		printf 'libplayit2.sh not found.\n'
-		exit 1
-	fi
+	: "${XDG_DATA_HOME:="$HOME/.local/share"}"
+	for path in\
+		"$PWD"\
+		"$XDG_DATA_HOME/play.it"\
+		'/usr/local/share/games/play.it'\
+		'/usr/local/share/play.it'\
+		'/usr/share/games/play.it'\
+		'/usr/share/play.it'
+	do
+		if [ -e "$path/libplayit2.sh" ]; then
+			PLAYIT_LIB2="$path/libplayit2.sh"
+			break
+		fi
+	done
 fi
-#shellcheck source=play.it-2/lib/libplayit2.sh
+if [ -z "$PLAYIT_LIB2" ]; then
+	printf '\n\033[1;31mError:\033[0m\n'
+	printf 'libplayit2.sh not found.\n'
+	exit 1
+fi
+# shellcheck source=play.it-2/lib/libplayit2.sh
 . "$PLAYIT_LIB2"
 
 # Extract game data
 
 extract_data_from "$SOURCE_ARCHIVE"
+prepare_package_layout
+rm --recursive "$PLAYIT_WORKDIR/gamedata"
 
-for PKG in $PACKAGES_LIST; do
-	organize_data "DOC_${PKG#PKG_}"  "$PATH_DOC"
-	organize_data "GAME_${PKG#PKG_}" "$PATH_GAME"
-done
+# Get game icon
 
 PKG='PKG_BIN'
-extract_and_sort_icons_from 'APP_MAIN'
-move_icons_to 'PKG_DATA'
-
-rm --recursive "$PLAYIT_WORKDIR/gamedata"
+icons_get_from_package 'APP_MAIN'
+icons_move_to 'PKG_DATA'
 
 # Write launchers
 
 PKG='PKG_BIN'
-write_launcher 'APP_MAIN'
+launchers_write 'APP_MAIN'
 
 # Store saved games outside of WINE prefix
 
