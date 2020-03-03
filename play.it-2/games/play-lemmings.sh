@@ -1,9 +1,9 @@
-#!/bin/sh -e
+#!/bin/sh
 set -o errexit
 
 ###
-# Copyright (c) 2015-2019, Antoine Le Gonidec
-# Copyright (c) 2018-2019, Dominique Derrier
+# Copyright (c) 2015-2020, Antoine "vv221/vv222" Le Gonidec
+# Copyright (c) 2018-2020, Dominique Derrier
 # All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
@@ -30,12 +30,12 @@ set -o errexit
 ###
 
 ###
-# Lemmings | floppy drive version
+# Lemmings
 # build native packages from the original installers
-# send your bug reports to vv221@dotslashplay.it
+# send your bug reports to contact@dotslashplay.it
 ###
 
-script_version=20190210.1
+script_version=20200303.1
 
 # Set game-specific variables
 
@@ -43,34 +43,26 @@ GAME_ID='lemmings'
 GAME_NAME='Lemmings'
 
 ARCHIVE_LTF='jeu-00005-lemmings-pcdos.7z'
-ARCHIVE_LTF_TYPE='7z'
 ARCHIVE_LTF_URL='https://www.abandonware-france.org/ltf_abandon/ltf_jeu.php?id=5'
 ARCHIVE_LTF_MD5='9fb084f3e8945e3280ed3058b6d4d851'
 ARCHIVE_LTF_SIZE='800'
 ARCHIVE_LTF_VERSION='1.0-ltf00005'
 
-ARCHIVE_GAME_BIN_PATH='lem'
-ARCHIVE_GAME_BIN_FILES='*.bat *.exe'
+ARCHIVE_GAME_MAIN_PATH='lem'
+ARCHIVE_GAME_MAIN_FILES='*.bat *.dat *.exe'
 
-ARCHIVE_GAME_DATA_PATH='lem'
-ARCHIVE_GAME_DATA_FILES='*.dat'
+ARCHIVE_DOC0_MAIN_PATH='.'
+ARCHIVE_DOC0_MAIN_FILES='*.txt'
 
-ARCHIVE_DOC0_DATA_PATH='.'
-ARCHIVE_DOC0_DATA_FILES='*.txt'
-
-ARCHIVE_DOC1_DATA_PATH='lem'
-ARCHIVE_DOC1_DATA_FILES='*.doc'
+ARCHIVE_DOC1_MAIN_PATH='lem'
+ARCHIVE_DOC1_MAIN_FILES='*.doc'
 
 APP_MAIN_TYPE='dosbox'
 APP_MAIN_EXE='lemmings.bat'
 
-PACKAGES_LIST='PKG_BIN PKG_DATA'
+PACKAGES_LIST='PKG_MAIN'
 
-PKG_DATA_ID="${GAME_ID}-data"
-PKG_DATA_DESCRIPTION='data'
-
-PKG_BIN_ARCH='32'
-PKG_BIN_DEPS="$PKG_DATA_ID dosbox"
+PKG_MAIN_DEPS='dosbox'
 
 # Load common functions
 
@@ -109,8 +101,7 @@ rm --recursive "$PLAYIT_WORKDIR/gamedata"
 
 # Write launchers
 
-PKG='PKG_BIN'
-launcher_write 'APP_MAIN'
+launchers_write 'APP_MAIN'
 
 # Build package
 
