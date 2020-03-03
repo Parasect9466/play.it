@@ -34,7 +34,7 @@ set -o errexit
 # send your bug reports to vv221@dotslashplay.it
 ###
 
-script_version=20200303.4
+script_version=20200303.5
 
 # Set game-specific variables
 
@@ -111,16 +111,26 @@ if [ $NEW_LAUNCH_REQUIRED -eq 1 ]; then
 	"$0"
 	exit 0
 fi'
-# shellcheck disable=SC2016
+APP_MAIN_PRERUN_LINUX="$APP_MAIN_PRERUN_LINUX"'
+# Ensure PulseAudio is running
+if pulseaudio --check; then
+	SHOULD_PULSEAUDIO_KEEP_RUNNING=1
+else
+	SHOULD_PULSEAUDIO_KEEP_RUNNING=0
+fi
+pulseaudio --start'
 APP_MAIN_PRERUN_LINUX="$APP_MAIN_PRERUN_LINUX"'
 # Work around infinite loading time bug
 gcc -m32 -o preload.so preload.c -ldl -shared -fPIC -Wall -Wextra
 LD_PRELOAD=./preload.so
 export LD_PRELOAD'
+APP_MAIN_POSTRUN_LINUX='unset LD_PRELOAD'
 # shellcheck disable=SC2016
-APP_MAIN_PRERUN_LINUX="$APP_MAIN_PRERUN_LINUX"'
-# Ensure PulseAudio is running
-pulseaudio --start'
+APP_MAIN_POSTRUN_LINUX="$APP_MAIN_POSTRUN_LINUX"'
+# Stop PulseAudio if it was not already running before starting the game
+if [ $SHOULD_PULSEAUDIO_KEEP_RUNNING -eq 0 ]; then
+	pulseaudio --kill
+fi'
 APP_MAIN_EXE_LINUX='Anomaly2'
 
 APP_MAIN_TYPE_WINDOWS='wine'
@@ -222,6 +232,7 @@ esac
 PKG='PKG_BIN'
 use_archive_specific_value 'APP_MAIN_TYPE'
 use_archive_specific_value 'APP_MAIN_PRERUN'
+use_archive_specific_value 'APP_MAIN_POSTRUN'
 use_archive_specific_value 'APP_MAIN_EXE'
 launchers_write 'APP_MAIN'
 
