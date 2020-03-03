@@ -35,7 +35,7 @@ set -o errexit
 # send your bug reports to contact@dotslashplay.it
 ###
 
-script_version=20200303.5
+script_version=20200303.6
 
 # Set game-specific variables
 
@@ -53,7 +53,7 @@ ARCHIVE_GAME_MAIN_PATH='app/c/dune2'
 ARCHIVE_GAME_MAIN_FILES='dune2.exe setup.exe setup*.dip *.pak *.dat *.cfg'
 
 APP_MAIN_TYPE='dosbox'
-APP_MAIN_EXE='dune2.exe'
+APP_MAIN_EXE='DUNE2.EXE'
 APP_MAIN_ICON='app/dune2.ico'
 
 PACKAGES_LIST='PKG_MAIN'
@@ -62,7 +62,7 @@ PKG_MAIN_DEPS='dosbox'
 
 # Load common functions
 
-target_version='2.11'
+target_version='2.12'
 
 if [ -z "$PLAYIT_LIB2" ]; then
 	: "${XDG_DATA_HOME:="$HOME/.local/share"}"
@@ -92,6 +92,7 @@ fi
 
 extract_data_from "$SOURCE_ARCHIVE"
 prepare_package_layout
+toupper "${PKG_MAIN_PATH}${PATH_GAME}"
 
 # Get game icon
 # As it is not using a standard size (99x99 pixels), it needs resizing
