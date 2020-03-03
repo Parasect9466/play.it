@@ -167,7 +167,7 @@ launcher_write_script_wine_prefix_build() {
 	fi
 	if [ -n "$APP_WINE_PUBLIC_CONFIG" ]; then
 	    CONFIG_DIRS="$CONFIG_DIRS publicconfig"
-	    public_config_path="$WINEPREFIX/drive_c/publics/Public/$APP_WINE_PUBLIC_CONFIG"
+	    public_config_path="$WINEPREFIX/drive_c/users/Public/$APP_WINE_PUBLIC_CONFIG"
 	    if [ ! -e "$public_config_path" ]; then
 		mkdir --parents "$(dirname "$public_config_path")"
 	        mkdir --parents "$PATH_CONFIG/publicconfig"
@@ -176,7 +176,7 @@ launcher_write_script_wine_prefix_build() {
 	fi
 	if [ -n "$APP_WINE_PUBLIC_DATA" ]; then
 	    DATA_DIRS="$DATA_DIRS publicdata"
-	    public_data_path="$WINEPREFIX/drive_c/publics/Public/$APP_WINE_PUBLIC_DATA"
+	    public_data_path="$WINEPREFIX/drive_c/users/Public/$APP_WINE_PUBLIC_DATA"
 	    if [ ! -e "$public_data_path" ]; then
 		mkdir --parents "$(dirname "$public_data_path")"
 	        mkdir --parents "$PATH_DATA/publicdata"
