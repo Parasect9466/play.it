@@ -34,7 +34,7 @@ set -o errexit
 # send your bug reports to vv221@dotslashplay.it
 ###
 
-script_version=20190624.1
+script_version=20200303.4
 
 # Set game-specific variables
 
@@ -73,28 +73,35 @@ ARCHIVE_GAME_DATA_FILES='*.idx *.str animations.dat common.dat scenes.dat sounds
 ARCHIVE_ICONS_PATH='.'
 ARCHIVE_ICONS_FILES='32x32 48x48 64x64 256x256'
 
-CONFIG_FILES='./userdata/config.bin'
-DATA_DIRS='./userdata/DefaultUser'
-DATA_FILES='./userdata/iPhoneProfiles'
+DATA_DIRS='./userdata'
+
+APP_WINE_USER_DATA='Application Data/11bitstudios/Anomaly 2'
 
 APP_MAIN_TYPE_LINUX='native'
 # shellcheck disable=SC2016
-APP_MAIN_PRERUN_LINUX='NEW_LAUNCH_REQUIRED=0
+APP_MAIN_PRERUN='# Keep compatibility with pre-20200303.1 scripts
+if [ -e "$PATH_CONFIG/userdata/config.bin" ]; then
+	mkdir --parents "$PATH_DATA/userdata"
+	cp --remove-destination "$PATH_CONFIG/userdata/config.bin" "$PATH_DATA/userdata"
+	mv "$PATH_CONFIG/userdata/config.bin" "$PATH_CONFIG/userdata/config.bin.old"
+fi'
+# shellcheck disable=SC2016
+APP_MAIN_PRERUN_LINUX="$APP_MAIN_PRERUN"'
+# Share saved games and config between Linux and Windows engines
+NEW_LAUNCH_REQUIRED=0
 if [ -e "$HOME/.Anomaly 2" ] && [ ! -h "$HOME/.Anomaly 2" ]; then
-	NEW_LAUNCH_REQUIRED=1
-	if [ -e "$HOME/.Anomaly 2/config.bin" ]; then
-		mkdir --parents "$PATH_CONFIG/userdata"
-		cp "$HOME/.Anomaly 2/config.bin" "$PATH_CONFIG/userdata"
-	fi
-	if [ -e "$HOME/.Anomaly 2/DefaultUser" ]; then
-		mkdir --parents "$PATH_DATA/userdata"
-		cp --recursive "$HOME/.Anomaly 2/DefaultUser" "$PATH_DATA/userdata"
-	fi
-	if [ -e "$HOME/.Anomaly 2/iPhoneProfiles" ]; then
-		mkdir --parents "$PATH_DATA/userdata"
-		cp "$HOME/.Anomaly 2/iPhoneProfiles" "$PATH_DATA/userdata"
-	fi
+	for file in \
+		config.bin \
+		DefaultUser \
+		iPhoneProfiles
+	do
+		if [ -e "$HOME/.Anomaly 2/$file" ]; then
+			mkdir --parents "$PATH_DATA/userdata"
+			cp --recursive "$HOME/.Anomaly 2/$file" "$PATH_DATA/userdata"
+		fi
+	done
 	mv "$HOME/.Anomaly 2" "$HOME/.Anomaly 2.old"
+	NEW_LAUNCH_REQUIRED=1
 fi
 if [ ! -e "$HOME/.Anomaly 2" ]; then
 	rm --force "$HOME/.Anomaly 2"
@@ -103,11 +110,17 @@ fi
 if [ $NEW_LAUNCH_REQUIRED -eq 1 ]; then
 	"$0"
 	exit 0
-fi
+fi'
+# shellcheck disable=SC2016
+APP_MAIN_PRERUN_LINUX="$APP_MAIN_PRERUN_LINUX"'
+# Work around infinite loading time bug
 gcc -m32 -o preload.so preload.c -ldl -shared -fPIC -Wall -Wextra
-pulseaudio --start
 LD_PRELOAD=./preload.so
 export LD_PRELOAD'
+# shellcheck disable=SC2016
+APP_MAIN_PRERUN_LINUX="$APP_MAIN_PRERUN_LINUX"'
+# Ensure PulseAudio is running
+pulseaudio --start'
 APP_MAIN_EXE_LINUX='Anomaly2'
 
 APP_MAIN_TYPE_WINDOWS='wine'
@@ -140,7 +153,7 @@ PKG_BIN_DEPS_WINDOWS="$PKG_COMMON_ID $PKG_DATA_ID wine glx xcursor"
 
 # Load common functions
 
-target_version='2.11'
+target_version='2.12'
 
 if [ -z "$PLAYIT_LIB2" ]; then
 	: "${XDG_DATA_HOME:="$HOME/.local/share"}"
@@ -239,25 +252,6 @@ case "$ARCHIVE" in
 			    _realSemTimedWait = dlsym(RTLD_NEXT, "sem_timedwait");
 			}
 			EOF
-		fi
-	;;
-esac
-
-# Store saved games and settings outside of WINE prefix
-
-# shellcheck disable=SC2031
-case "$ARCHIVE" in
-	('ARCHIVE_WINDOWS'*)
-		# shellcheck disable=SC2016
-		saves_path='$WINEPREFIX/drive_c/users/$(whoami)/Application Data/11bitstudios/Anomaly 2'
-		# shellcheck disable=SC2016
-		pattern='s#init_prefix_dirs "$PATH_DATA" "$DATA_DIRS"#&'
-		pattern="$pattern\\nif [ ! -e \"$saves_path\" ]; then"
-		pattern="$pattern\\n\\tmkdir --parents \"${saves_path%/*}\""
-		pattern="$pattern\\n\\tln --symbolic \"\$PATH_DATA/userdata\" \"$saves_path\""
-		pattern="$pattern\\nfi#"
-		if [ $DRY_RUN -eq 0 ]; then
-			sed --in-place "$pattern" "${PKG_BIN_PATH}${PATH_BIN}"/*
 		fi
 	;;
 esac
