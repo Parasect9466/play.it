@@ -31,10 +31,10 @@ set -o errexit
 ###
 # Torchlight
 # build native packages from the original installers
-# send your bug reports to vv221@dotslashplay.it
+# send your bug reports to contact@dotslashplay.it
 ###
 
-script_version=20190221.1
+script_version=20200303.1
 
 # Set game-specific variables
 
@@ -71,7 +71,7 @@ ARCHIVE_GAME_DATA_FILES='buildver.txt runicgames.ico torchlight.ico logo.bmp pak
 # Keep comaptibility with old archives
 ARCHIVE_GAME_DATA_PATH_GOG_OLD0='app'
 
-DATA_DIRS='./userdata'
+APP_WINE_USER_DATA='Application Data/runic games/torchlight'
 
 APP_MAIN_TYPE='wine'
 APP_MAIN_EXE='torchlight.exe'
@@ -92,7 +92,7 @@ PKG_BIN_PROVIDE='torchlight'
 
 # Load common functions
 
-target_version='2.11'
+target_version='2.12'
 
 if [ -z "$PLAYIT_LIB2" ]; then
 	: "${XDG_DATA_HOME:="$HOME/.local/share"}"
@@ -133,18 +133,6 @@ icons_get_from_package 'APP_MAIN'
 
 PKG='PKG_BIN'
 launcher_write 'APP_MAIN'
-
-# Store saved games and settings outside of WINE prefix
-
-# shellcheck disable=SC2016
-saves_path='$WINEPREFIX/drive_c/users/$(whoami)/Application Data/runic games/torchlight'
-# shellcheck disable=SC2016
-pattern='s#init_prefix_dirs "$PATH_DATA" "$DATA_DIRS"#&'
-pattern="$pattern\\nif [ ! -e \"$saves_path\" ]; then"
-pattern="$pattern\\n\\tmkdir --parents \"${saves_path%/*}\""
-pattern="$pattern\\n\\tln --symbolic \"\$PATH_DATA/userdata\" \"$saves_path\""
-pattern="$pattern\\nfi#"
-sed --in-place "$pattern" "${PKG_BIN_PATH}${PATH_BIN}"/*
 
 # Build package
 
