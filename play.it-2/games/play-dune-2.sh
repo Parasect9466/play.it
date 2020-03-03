@@ -1,9 +1,9 @@
-#!/bin/sh -e
+#!/bin/sh
 set -o errexit
 
 ###
-# Copyright (c) 2015-2019, Antoine Le Gonidec
-# Copyright (c) 2018-2019, Dominique Derrier
+# Copyright (c) 2015-2020, Antoine "vv221/vv222" Le Gonidec
+# Copyright (c) 2018-2020, Dominique Derrier
 # All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
@@ -30,42 +30,35 @@ set -o errexit
 ###
 
 ###
-# Dune II : Battle for Arrakis
+# Dune Ⅱ: Battle for Arrakis
 # build native packages from the original installers
-# send your bug reports to vv221@dotslashplay.it
+# send your bug reports to contact@dotslashplay.it
 ###
 
-script_version=20190210.1
+script_version=20200303.5
 
 # Set game-specific variables
 
 GAME_ID='dune-2'
-GAME_NAME='Dune II: Battle for Arrakis'
+GAME_NAME='Dune Ⅱ: Battle for Arrakis'
 
 ARCHIVE_LTF='setup-00022-DuneII-PCDOS.exe'
-ARCHIVE_LTF_TYPE='innosetup'
 ARCHIVE_LTF_URL='https://www.abandonware-france.org/ltf_abandon/ltf_jeu.php?id=22'
 ARCHIVE_LTF_MD5='b2e6aa471d07d846cd6df3ed1d8ecb0c'
+ARCHIVE_LTF_VERSION='1.07-ltf00022'
+ARCHIVE_LTF_TYPE='innosetup'
 ARCHIVE_LTF_SIZE='340000'
-ARCHIVE_LTF_VERSION='1.0-ltf00022'
 
-ARCHIVE_GAME_BIN_PATH='app/c/dune2'
-ARCHIVE_GAME_BIN_FILES='dune2.exe setup.exe setup*.dip'
-
-ARCHIVE_GAME_DATA_PATH='app/c/dune2'
-ARCHIVE_GAME_DATA_FILES='*.pak *.dat *.cfg'
+ARCHIVE_GAME_MAIN_PATH='app/c/dune2'
+ARCHIVE_GAME_MAIN_FILES='dune2.exe setup.exe setup*.dip *.pak *.dat *.cfg'
 
 APP_MAIN_TYPE='dosbox'
 APP_MAIN_EXE='dune2.exe'
 APP_MAIN_ICON='app/dune2.ico'
 
-PACKAGES_LIST='PKG_BIN PKG_DATA'
+PACKAGES_LIST='PKG_MAIN'
 
-PKG_DATA_ID="${GAME_ID}-data"
-PKG_DATA_DESCRIPTION='data'
-
-PKG_BIN_ARCH='32'
-PKG_BIN_DEPS="$PKG_DATA_ID dosbox"
+PKG_MAIN_DEPS='dosbox'
 
 # Load common functions
 
@@ -100,16 +93,19 @@ fi
 extract_data_from "$SOURCE_ARCHIVE"
 prepare_package_layout
 
-# Extract icons
+# Get game icon
+# As it is not using a standard size (99x99 pixels), it needs resizing
 
-PKG='PKG_DATA'
-icons_get_from_workdir 'APP_MAIN'
+PATH_ICON="${PATH_ICON_BASE}/72x72/apps"
+source="$PLAYIT_WORKDIR/gamedata/$APP_MAIN_ICON"
+destination="${PKG_MAIN_PATH}${PATH_ICON}/${GAME_ID}.png"
+mkdir --parents "$(dirname "$destination")"
+convert "$source" -resize 72 "$destination"
 rm --recursive "$PLAYIT_WORKDIR/gamedata"
 
 # Write launchers
 
-PKG='PKG_BIN'
-launcher_write 'APP_MAIN'
+launchers_write 'APP_MAIN'
 
 # Build package
 
