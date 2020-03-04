@@ -116,39 +116,7 @@ launcher_write_script_wine_prefix_build() {
 	EOF
 
 	cat >> "$file" <<- 'EOF'
-	for dir in "$PATH_PREFIX" "$PATH_CONFIG" "$PATH_DATA"; do
-	    if [ ! -e "$dir" ]; then
-	        mkdir --parents "$dir"
-	    fi
-	done
-	(
-	    cd "$PATH_GAME"
-	    find . -type d | while read -r dir; do
-	        if [ -h "$PATH_PREFIX/$dir" ]; then
-	            rm "$PATH_PREFIX/$dir"
-	        fi
-	    done
-	)
-	cp --recursive --remove-destination --symbolic-link "$PATH_GAME"/* "$PATH_PREFIX"
-	(
-	    cd "$PATH_PREFIX"
-	    find . -type l | while read -r link; do
-	        if [ ! -e "$link" ]; then
-	            rm "$link"
-	        fi
-	    done
-	    find . -depth -type d | while read -r dir; do
-	        if [ ! -e "$PATH_GAME/$dir" ]; then
-	            rmdir --ignore-fail-on-non-empty "$dir"
-	        fi
-	    done
-	)
-	init_userdir_files "$PATH_CONFIG" "$CONFIG_FILES"
-	init_userdir_files "$PATH_DATA" "$DATA_FILES"
-	init_prefix_files "$PATH_CONFIG" "$CONFIG_FILES"
-	init_prefix_files "$PATH_DATA" "$DATA_FILES"
-	init_prefix_dirs "$PATH_CONFIG" "$CONFIG_DIRS"
-	init_prefix_dirs "$PATH_DATA" "$DATA_DIRS"
+	prefix_build
 
 	EOF
 	sed --in-place 's/    /\t/g' "$file"

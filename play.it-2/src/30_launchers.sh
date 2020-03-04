@@ -94,6 +94,7 @@ launcher_write_script() {
 			launcher_write_script_prefix_functions "$target_file"
 			launcher_write_script_prefix_build "$target_file"
 			launcher_write_script_dosbox_run "$application" "$target_file"
+			launcher_write_script_prefix_cleanup "$target_file"
 		;;
 		('java')
 			launcher_write_script_java_application_variables "$application" "$target_file"
@@ -103,6 +104,7 @@ launcher_write_script() {
 			launcher_write_script_prefix_functions "$target_file"
 			launcher_write_script_prefix_build "$target_file"
 			launcher_write_script_java_run "$application" "$target_file"
+			launcher_write_script_prefix_cleanup "$target_file"
 		;;
 		('native')
 			launcher_write_script_native_application_variables "$application" "$target_file"
@@ -112,6 +114,7 @@ launcher_write_script() {
 			launcher_write_script_prefix_functions "$target_file"
 			launcher_write_script_prefix_build "$target_file"
 			launcher_write_script_native_run "$application" "$target_file"
+			launcher_write_script_prefix_cleanup "$target_file"
 		;;
 		('native_no-prefix')
 			launcher_write_script_native_application_variables "$application" "$target_file"
@@ -137,6 +140,7 @@ launcher_write_script() {
 			else
 				launcher_write_script_wine_run "$application" "$target_file"
 			fi
+			launcher_write_script_prefix_cleanup "$target_file"
 		;;
 		(*)
 			error_unknown_application_type "$application_type"
@@ -246,73 +250,279 @@ launcher_write_script_prefix_functions() {
 	local file
 	file="$1"
 	cat >> "$file" <<- 'EOF'
+	# Set localization and error reporting functions
+
+	# select strings matching the current locale
+	# strings must be prefixed by a two-letter language code and a colon
+	# USAGE: localize $string[…]
+	localize() {
+	    local lang
+	    local string
+	    local match
+	    for lang in "${LANG%%_*}" 'en'; do
+	        for string in "$@"; do
+	            if [ "${string%%:*}" = "$lang" ]; then
+	                echo "${string#*:}"
+	                match=1
+	            fi
+	        done
+	        if [ "$match" ]; then
+	            break
+	        fi
+	    done
+	}
+
+	# print a localized message on standard error output
+	# strings must be prefixed by a two-letter language code and a colon
+	# USAGE: display_message $string[…]
+	display_message() {
+	    local string
+	    localize "$@" | while read -r string; do
+	        printf "$string\n"
+	    done 1>&2
+	}
+
+	# print a localized error message on standard error output
+	# strings must be prefixed by a two-letter language code and a colon
+	# USAGE: display_error $string[…]
+	display_error() {
+	    display_message \
+	        'en:\033[1;31mError:\033[0m' \
+	        'fr:\033[1;31mErreur :\033[0m'
+	    display_message "$@"
+	}
+
+	# print a localized warning message on standard error output
+	# strings must be prefixed by a two-letter language code and a colon
+	# USAGE: display_warning $string[…]
+	display_warning() {
+	    display_message \
+	        'en:\033[1;33mWarning:\033[0m' \
+	        'fr:\033[1;33mAvertissement :\033[0m'
+	    display_message "$@"
+	}
+
 	# Set prefix-related functions
 
-	init_prefix_dirs() {
-	    (
-	        cd "$PATH_GAME"
-	        for dir in $2; do
-	            if [ ! -e "$1/$dir" ]; then
-	                if [ -e "$PATH_PREFIX/$dir" ]; then
-	                    (
-	                        cd "$PATH_PREFIX"
-	                        cp --dereference --parents --recursive "$dir" "$1"
-	                    )
-	                elif [ -e "$PATH_GAME/$dir" ]; then
-	                    cp --parents --recursive "$dir" "$1"
-	                else
-	                    mkdir --parents "$1/$dir"
-	                fi
-	            fi
-	            rm --force --recursive "$PATH_PREFIX/$dir"
-	            mkdir --parents "$PATH_PREFIX/$(dirname "$dir")"
-	            ln --symbolic "$(readlink --canonicalize-existing "$1/$dir")" "$PATH_PREFIX/$dir"
-	        done
-	    )
+	# create prefix and user config/data directories
+	# USAGE: prefix_create_dirs
+	prefix_create_dirs() {
+	    for dir in "$PATH_PREFIX" "$PATH_CONFIG" "$PATH_DATA"; do
+	        if [ ! -d "$dir" ]; then
+	            mkdir --parents "$dir"
+	        fi
+	    done
 	}
 
-	init_prefix_files() {
+	# populate prefix with symbolic links to all game file
+	# USAGE: prefix_init_game_files
+	prefix_init_game_files() {
+	    # remove symlinks to game directories
 	    (
-	        local file_prefix
-	        local file_real
-	        cd "$1"
-	        find -L . -type f | while read -r file; do
-	            if [ -e "$PATH_PREFIX/$file" ]; then
-	                file_prefix="$(readlink -e "$PATH_PREFIX/$file")"
-	            else
-	                unset file_prefix
-	            fi
-	            file_real="$(readlink -e "$file")"
-	            if [ "$file_real" != "$file_prefix" ]; then
-	                if [ "$file_prefix" ]; then
-	                    rm --force "$PATH_PREFIX/$file"
-	                fi
-	                mkdir --parents "$PATH_PREFIX/$(dirname "$file")"
-	                ln --symbolic "$file_real" "$PATH_PREFIX/$file"
+	        cd "$PATH_GAME"
+	        find . -type d | while read -r dir; do
+	            if [ -h "$PATH_PREFIX/$dir" ]; then
+	                rm "$PATH_PREFIX/$dir"
 	            fi
 	        done
 	    )
+	    # populate prefix with symlinks to all game file
+	    cp --recursive --remove-destination --symbolic-link --no-target-directory "$PATH_GAME" "$PATH_PREFIX"
+	    # remove dangling links and non-game empty directories
 	    (
 	        cd "$PATH_PREFIX"
-	        for file in $2; do
-	            if [ -e "$file" ] && [ ! -e "$1/$file" ]; then
-	                cp --parents "$file" "$1"
-	                rm --force "$file"
-	                ln --symbolic "$1/$file" "$file"
+	        find . -type l | while read -r link; do
+	            if [ ! -e "$link" ]; then
+	                rm "$link"
+	            fi
+	        done
+	        find . -depth -type d | while read -r dir; do
+	            if [ ! -e "$PATH_GAME/$dir" ]; then
+	                rmdir --ignore-fail-on-non-empty "$dir"
 	            fi
 	        done
 	    )
 	}
 
-	init_userdir_files() {
+	# create symbolic link $PATH_PREFIX/$target -> $userdir/$target,
+	# overwriting $PATH_PREFIX/$target if it exists
+	# USAGE: prefix_symlink_to_userdir $userdir $target
+	prefix_symlink_to_userdir() {
+	    local userdir
+	    local target
+	    local target_prefix
+	    local target_real
+	    userdir="$1"
+	    target="$2"
+	    if [ -e "$PATH_PREFIX/$target" ]; then
+	        target_prefix="$(readlink --canonicalize-existing "$PATH_PREFIX/$target")"
+	    else
+	        unset target_prefix
+	    fi
+	    target_real="$(readlink --canonicalize-existing "$userdir/$target")"
+	    if [ "$target_real" != "$target_prefix" ]; then
+	        if [ "$target_prefix" ]; then
+	            rm --force --recursive "$PATH_PREFIX/$target"
+	        fi
+	        mkdir --parents "$PATH_PREFIX/$(dirname "$target")"
+	        ln --symbolic "$target_real" "$PATH_PREFIX/$target"
+	    fi
+	}
+
+	# move $PATH_PREFIX/$target to $userdir/$target (overwriting it if it exists),
+	# and create symbolic link $PATH_PREFIX/$target -> $userdir/$target
+	# USAGE: prefix_move_to_userdir_and_symlink $userdir $target
+	prefix_move_to_userdir_and_symlink() {
+	    local userdir
+	    local target
+	    userdir="$1"
+	    target="$2"
+	    if [ -e "$userdir/$target" ]; then
+	        rm --force --recursive "$userdir/$target"
+	    fi
+	    mkdir --parents "$userdir/$(dirname "$target")"
+	    cp --recursive --dereference --no-target-directory "$PATH_PREFIX/$target" "$userdir/$target"
+	    rm --force --recursive "$PATH_PREFIX/$target"
+	    ln --symbolic "$userdir/$target" "$PATH_PREFIX/$target"
+	}
+
+	# initialize prefix with user directories
+	# USAGE: prefix_init_user_dirs $userdir $dirs
+	prefix_init_user_dirs() {
+	    local userdir
+	    local dirs
+	    userdir="$1"
+	    dirs="$2"
+	    # populate prefix with symlinks to specified directories
 	    (
-	        cd "$PATH_GAME"
-	        for file in $2; do
-	            if [ ! -e "$1/$file" ] && [ -e "$file" ]; then
-	                cp --parents "$file" "$1"
+	        cd "$userdir"
+	        for dir in $dirs; do
+	            [ -d "$dir" ] || continue
+	            prefix_symlink_to_userdir "$userdir" "$dir"
+	        done
+	    )
+	    # move specified directories, if any, from prefix back to user directory
+	    (
+	        cd "$PATH_PREFIX"
+	        for dir in $dirs; do
+	            [ -d "$dir" ] || continue
+	            if [ ! -e "$userdir/$dir" ]; then
+	                prefix_move_to_userdir_and_symlink "$userdir" "$dir"
+	            elif [ ! -d "$userdir/$dir" ]; then
+	                display_warning \
+	                    "en:Cannot overwrite '$userdir/$dir' with directory '$PATH_PREFIX/$dir'" \
+	                    "fr:Impossible d'écraser '$userdir/$dir' par le répertoire '$PATH_PREFIX/$dir'"
 	            fi
 	        done
 	    )
+	}
+
+	# initialize prefix with user files
+	# USAGE: prefix_init_user_files $userdir $files
+	prefix_init_user_files() {
+	    local userdir
+	    local files
+	    userdir="$1"
+	    files="$2"
+	    # populate prefix with symlinks to all files in user directory
+	    (
+	        cd "$userdir"
+	        find -L . -type f | while read -r file; do
+	            prefix_symlink_to_userdir "$userdir" "$file"
+	        done
+	    )
+	    # move specified files, if any, from prefix back to user directory
+	    (
+	        cd "$PATH_PREFIX"
+	        for file in $files; do
+	            [ -f "$file" ] || continue
+	            if [ ! -e "$userdir/$file" ]; then
+	                prefix_move_to_userdir_and_symlink "$userdir" "$file"
+	            elif [ ! -f "$userdir/$file" ]; then
+	                display_warning \
+	                    "en:Cannot overwrite '$userdir/$file' with file '$PATH_PREFIX/$file'" \
+	                    "fr:Impossible d'écraser '$userdir/$file' par le fichier '$PATH_PREFIX/$file'"
+	            fi
+	        done
+	    )
+	}
+
+	# synchronize user directories with prefix
+	# USAGE: prefix_sync_user_dirs $userdir $dirs
+	prefix_sync_user_dirs() {
+	    local userdir
+	    local dirs
+	    userdir="$1"
+	    dirs="$2"
+	    # move specified directories, if any, from prefix back to user directory
+	    (
+	        cd "$PATH_PREFIX"
+	        for dir in $dirs; do
+	            [ -d "$dir" ] || continue
+	            if [ ! -h "$dir" ]; then
+	                prefix_move_to_userdir_and_symlink "$userdir" "$dir"
+	            fi
+	        done
+	    )
+	    # remove user directories which are not in the prefix anymore, if any
+	    (
+	        cd "$userdir"
+	        for dir in $dirs; do
+	            [ -d "$dir" ] || continue
+	            if [ ! -e "$PATH_PREFIX/$dir" ]; then
+	                rm --force --recursive "$dir"
+	            fi
+	        done
+	    )
+	}
+
+	# synchronize user files with prefix
+	# USAGE: prefix_sync_user_files $userdir $files
+	prefix_sync_user_files() {
+	    local userdir
+	    local files
+	    userdir="$1"
+	    files="$2"
+	    # move specified files, if any, from prefix back to user directory
+	    (
+	        cd "$PATH_PREFIX"
+	        for file in $files; do
+	            [ -f "$file" ] || continue
+	            if [ ! -h "$file" ]; then
+	                prefix_move_to_userdir_and_symlink "$userdir" "$file"
+	            fi
+	        done
+	    )
+	    # remove user files which are not in the prefix anymore, if any
+	    (
+	        cd "$userdir"
+	        for file in $files; do
+	            [ -f "$file" ] || continue
+	            if [ ! -e "$PATH_PREFIX/$file" ]; then
+	                rm --force --recursive "$file"
+	            fi
+	        done
+	    )
+	}
+
+	# create and initialize user prefix
+	# USAGE: prefix_build
+	prefix_build() {
+	    prefix_create_dirs
+	    prefix_init_game_files
+	    prefix_init_user_dirs "$PATH_CONFIG" "$CONFIG_DIRS"
+	    prefix_init_user_dirs "$PATH_DATA" "$DATA_DIRS"
+	    prefix_init_user_files "$PATH_CONFIG" "$CONFIG_FILES"
+	    prefix_init_user_files "$PATH_DATA" "$DATA_FILES"
+	}
+
+	# clean up and synchronize back user prefix
+	# USAGE: prefix_cleanup
+	prefix_cleanup() {
+	    prefix_sync_user_dirs "$PATH_CONFIG" "$CONFIG_DIRS"
+	    prefix_sync_user_dirs "$PATH_DATA" "$DATA_DIRS"
+	    prefix_sync_user_files "$PATH_CONFIG" "$CONFIG_FILES"
+	    prefix_sync_user_files "$PATH_DATA" "$DATA_FILES"
 	}
 
 	EOF
@@ -330,39 +540,23 @@ launcher_write_script_prefix_build() {
 	# Build user prefix
 
 	PATH_PREFIX="$XDG_DATA_HOME/play.it/prefixes/$PREFIX_ID"
-	for dir in "$PATH_PREFIX" "$PATH_CONFIG" "$PATH_DATA"; do
-	    if [ ! -e "$dir" ]; then
-	        mkdir --parents "$dir"
-	    fi
-	done
-	(
-	    cd "$PATH_GAME"
-	    find . -type d | while read -r dir; do
-	        if [ -h "$PATH_PREFIX/$dir" ]; then
-	            rm "$PATH_PREFIX/$dir"
-	        fi
-	    done
-	)
-	cp --recursive --remove-destination --symbolic-link "$PATH_GAME"/* "$PATH_PREFIX"
-	(
-	    cd "$PATH_PREFIX"
-	    find . -type l | while read -r link; do
-	        if [ ! -e "$link" ]; then
-	            rm "$link"
-	        fi
-	    done
-	    find . -depth -type d | while read -r dir; do
-	        if [ ! -e "$PATH_GAME/$dir" ]; then
-	            rmdir --ignore-fail-on-non-empty "$dir"
-	        fi
-	    done
-	)
-	init_userdir_files "$PATH_CONFIG" "$CONFIG_FILES"
-	init_userdir_files "$PATH_DATA" "$DATA_FILES"
-	init_prefix_files "$PATH_CONFIG" "$CONFIG_FILES"
-	init_prefix_files "$PATH_DATA" "$DATA_FILES"
-	init_prefix_dirs "$PATH_CONFIG" "$CONFIG_DIRS"
-	init_prefix_dirs "$PATH_DATA" "$DATA_DIRS"
+	prefix_build
+
+	EOF
+	sed --in-place 's/    /\t/g' "$file"
+	return 0
+}
+
+# write launcher script prefix cleanup
+# USAGE: launcher_write_script_prefix_cleanup $file
+# CALLED BY: launcher_write_build
+launcher_write_script_prefix_cleanup() {
+	local file
+	file="$1"
+	cat >> "$file" <<- 'EOF'
+	# Clean up user prefix
+
+	prefix_cleanup
 
 	EOF
 	sed --in-place 's/    /\t/g' "$file"
