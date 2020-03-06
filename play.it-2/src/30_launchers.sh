@@ -569,6 +569,23 @@ launcher_write_script_prefix_functions() {
 	return 0
 }
 
+# write launcher script prefix prepare hook
+# USAGE: launcher_write_script_prefix_prepare $file
+# CALLED BY: launcher_write_script_prefix_build launcher_write_script_wine_prefix_build
+launcher_write_script_prefix_prepare() {
+	local file
+	file="$1"
+
+	if [ "$PREFIX_PREPARE" ]; then
+		cat >> "$file" <<- EOF
+		$PREFIX_PREPARE
+
+		EOF
+	fi
+
+	return 0
+}
+
 # write launcher script prefix initialization
 # USAGE: launcher_write_script_prefix_build $file
 # CALLED BY: launcher_write_build
@@ -580,6 +597,12 @@ launcher_write_script_prefix_build() {
 
 	PATH_PREFIX="$XDG_DATA_HOME/play.it/prefixes/$PREFIX_ID"
 	PREFIX_LOCK="$PATH_PREFIX/.$GAME_ID.lock"
+
+	EOF
+
+	launcher_write_script_prefix_prepare "$file"
+
+	cat >> "$file" <<- 'EOF'
 	prefix_build
 
 	EOF

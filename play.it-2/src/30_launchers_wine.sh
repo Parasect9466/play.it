@@ -114,7 +114,10 @@ launcher_write_script_wine_prefix_build() {
 
 	cat >> "$file" <<- 'EOF'
 	fi
+
 	EOF
+
+	launcher_write_script_prefix_prepare "$file"
 
 	cat >> "$file" <<- 'EOF'
 	prefix_build
