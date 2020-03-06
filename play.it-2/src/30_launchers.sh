@@ -386,132 +386,101 @@ launcher_write_script_prefix_functions() {
 	    ln --symbolic "$userdir/$target" "$PATH_PREFIX/$target"
 	}
 
-	# initialize prefix with user directories
-	# USAGE: prefix_init_user_dirs $userdir $dirs
-	prefix_init_user_dirs() {
-	    local userdir
-	    local dirs
-	    userdir="$1"
-	    dirs="$2"
-	    # populate prefix with symlinks to specified directories
-	    (
-	        cd "$userdir"
-	        for dir in $dirs; do
-	            [ -d "$dir" ] || continue
-	            prefix_symlink_to_userdir "$userdir" "$dir"
-	        done
-	    )
-	    # move specified directories, if any, from prefix back to user directory
-	    (
-	        cd "$PATH_PREFIX"
-	        for dir in $dirs; do
-	            [ -d "$dir" ] || continue
-	            if [ ! -e "$userdir/$dir" ]; then
-	                prefix_move_to_userdir_and_symlink "$userdir" "$dir"
-	            elif [ ! -d "$userdir/$dir" ]; then
-	                display_warning \
-	                    "en:Cannot overwrite '$userdir/$dir' with directory '$PATH_PREFIX/$dir'" \
-	                    "fr:Impossible d'écraser '$userdir/$dir' par le répertoire '$PATH_PREFIX/$dir'"
-	            fi
-	        done
-	    )
+	# return the localized name of a given file type ('f' or 'd')
+	# USAGE: get_type_name $type
+	get_type_name() {
+	    local type
+	    type="$1"
+	    case "$type" in
+	        ('f')
+	            localize 'en:file' 'fr:le fichier'
+	        ;;
+	        ('d')
+	            localize 'en:directory' 'fr:le répertoire'
+	        ;;
+	        (*)
+	            display_error \
+	                "en:Invalid file type in launcher script: '$type'" \
+	                "fr:Type de fichier invalide dans le script : '$type'"
+	            exit 1
+	        ;;
+	    esac
 	}
 
-	# initialize prefix with user files
-	# USAGE: prefix_init_user_files $userdir $files
+	# initialize prefix with user files or directories
+	# USAGE: prefix_init_user_files $type $userdir $list
 	prefix_init_user_files() {
+	    local type
 	    local userdir
-	    local files
-	    userdir="$1"
-	    files="$2"
-	    # populate prefix with symlinks to all files in user directory
+	    local list
+	    local type_name
+	    type="$1"
+	    userdir="$2"
+	    list="$3"
+	    type_name=$(get_type_name "$type")
+	    # populate prefix with symlinks to specified files or directories
 	    (
 	        cd "$userdir"
-	        find -L . -type f | while read -r file; do
-	            prefix_symlink_to_userdir "$userdir" "$file"
+	        if [ "$type" = 'f' ]; then
+	            # symlink to all files, even those not specified in $list
+	            find -L . -type f
+	        else
+	            for target in $list; do echo "$target"; done
+	        fi | while read -r target; do
+	            [ "-$type" "$target" ] || continue
+	            prefix_symlink_to_userdir "$userdir" "$target"
 	        done
 	    )
-	    # move specified files, if any, from prefix back to user directory
+	    # move specified files or directories, if any, from prefix back to user directory
 	    (
 	        cd "$PATH_PREFIX"
-	        for file in $files; do
-	            [ -f "$file" ] || continue
-	            if [ ! -e "$userdir/$file" ]; then
-	                prefix_move_to_userdir_and_symlink "$userdir" "$file"
-	            elif [ ! -f "$userdir/$file" ]; then
+	        for target in $list; do
+	            [ "-$type" "$target" ] || continue
+	            if [ ! -e "$userdir/$target" ]; then
+	                prefix_move_to_userdir_and_symlink "$userdir" "$target"
+	            elif [ ! "-$type" "$userdir/$target" ]; then
 	                display_warning \
-	                    "en:Cannot overwrite '$userdir/$file' with file '$PATH_PREFIX/$file'" \
-	                    "fr:Impossible d'écraser '$userdir/$file' par le fichier '$PATH_PREFIX/$file'"
+	                    "en:Cannot overwrite '$userdir/$target' with $type_name '$PATH_PREFIX/$target'" \
+	                    "fr:Impossible d'écraser '$userdir/$target' par $type_name '$PATH_PREFIX/$target'"
 	            fi
 	        done
 	    )
 	}
 
-	# synchronize user directories with prefix
-	# USAGE: prefix_sync_user_dirs $userdir $dirs
-	prefix_sync_user_dirs() {
-	    local userdir
-	    local dirs
-	    userdir="$1"
-	    dirs="$2"
-	    # move specified directories, if any, from prefix back to user directory
-	    (
-	        cd "$PATH_PREFIX"
-	        for dir in $dirs; do
-	            [ -d "$dir" ] || continue
-	            if [ ! -h "$dir" ]; then
-	                if [ ! -e "$userdir/$dir" ] || [ -d "$userdir/$dir" ]; then
-	                    prefix_move_to_userdir_and_symlink "$userdir" "$dir"
-	                else
-	                    display_warning \
-	                        "en:Cannot overwrite '$userdir/$dir' with directory '$PATH_PREFIX/$dir'" \
-	                        "fr:Impossible d'écraser '$userdir/$dir' par le répertoire '$PATH_PREFIX/$dir'"
-	                fi
-	            fi
-	        done
-	    )
-	    # remove user directories which are not in the prefix anymore, if any
-	    (
-	        cd "$userdir"
-	        for dir in $dirs; do
-	            [ -d "$dir" ] || continue
-	            if [ ! -e "$PATH_PREFIX/$dir" ]; then
-	                rm --force --recursive "$dir"
-	            fi
-	        done
-	    )
-	}
-
-	# synchronize user files with prefix
-	# USAGE: prefix_sync_user_files $userdir $files
+	# synchronize user files or directories with prefix
+	# USAGE: prefix_sync_user_files $type $userdir $list
 	prefix_sync_user_files() {
+	    local type
 	    local userdir
-	    local files
-	    userdir="$1"
-	    files="$2"
-	    # move specified files, if any, from prefix back to user directory
+	    local list
+	    local type_name
+	    type="$1"
+	    userdir="$2"
+	    list="$3"
+	    type_name=$(get_type_name "$type")
+	    # move specified files or directories, if any, from prefix back to user directory
 	    (
 	        cd "$PATH_PREFIX"
-	        for file in $files; do
-	            [ -f "$file" ] || continue
-	            if [ ! -h "$file" ]; then
-	                if [ ! -e "$userdir/$file" ] || [ -f "$userdir/$file" ]; then
-	                    prefix_move_to_userdir_and_symlink "$userdir" "$file"
+	        for target in $list; do
+	            [ "-$type" "$target" ] || continue
+	            if [ ! -h "$target" ]; then
+	                if [ ! -e "$userdir/$target" ] || [ "-$type" "$userdir/$target" ]; then
+	                    prefix_move_to_userdir_and_symlink "$userdir" "$target"
 	                else
 	                    display_warning \
-	                        "en:Cannot overwrite '$userdir/$file' with file '$PATH_PREFIX/$file'" \
-	                        "fr:Impossible d'écraser '$userdir/$file' par le fichier '$PATH_PREFIX/$file'"
+	                        "en:Cannot overwrite '$userdir/$target' with $type_name '$PATH_PREFIX/$target'" \
+	                        "fr:Impossible d'écraser '$userdir/$target' par $type_name '$PATH_PREFIX/$target'"
 	                fi
 	            fi
 	        done
 	    )
-	    # remove user files which are not in the prefix anymore, if any
+	    # remove user files or directories which are not in the prefix anymore, if any
 	    (
 	        cd "$userdir"
-	        for file in $files; do
-	            [ -f "$file" ] || continue
-	            if [ ! -e "$PATH_PREFIX/$file" ]; then
-	                rm --force --recursive "$file"
+	        for target in $list; do
+	            [ "-$type" "$target" ] || continue
+	            if [ ! -e "$PATH_PREFIX/$target" ]; then
+	                rm --force --recursive "$target"
 	            fi
 	        done
 	    )
@@ -547,20 +516,20 @@ launcher_write_script_prefix_functions() {
 	    fi
 	    prefix_create_dirs
 	    prefix_init_game_files
-	    prefix_init_user_dirs "$PATH_CONFIG" "$CONFIG_DIRS"
-	    prefix_init_user_dirs "$PATH_DATA" "$DATA_DIRS"
-	    prefix_init_user_files "$PATH_CONFIG" "$CONFIG_FILES"
-	    prefix_init_user_files "$PATH_DATA" "$DATA_FILES"
+	    prefix_init_user_files 'd' "$PATH_CONFIG" "$CONFIG_DIRS"
+	    prefix_init_user_files 'd' "$PATH_DATA" "$DATA_DIRS"
+	    prefix_init_user_files 'f' "$PATH_CONFIG" "$CONFIG_FILES"
+	    prefix_init_user_files 'f' "$PATH_DATA" "$DATA_FILES"
 	    touch "$PREFIX_LOCK"
 	}
 
 	# clean up and synchronize back user prefix
 	# USAGE: prefix_cleanup
 	prefix_cleanup() {
-	    prefix_sync_user_dirs "$PATH_CONFIG" "$CONFIG_DIRS"
-	    prefix_sync_user_dirs "$PATH_DATA" "$DATA_DIRS"
-	    prefix_sync_user_files "$PATH_CONFIG" "$CONFIG_FILES"
-	    prefix_sync_user_files "$PATH_DATA" "$DATA_FILES"
+	    prefix_sync_user_files 'd' "$PATH_CONFIG" "$CONFIG_DIRS"
+	    prefix_sync_user_files 'd' "$PATH_DATA" "$DATA_DIRS"
+	    prefix_sync_user_files 'f' "$PATH_CONFIG" "$CONFIG_FILES"
+	    prefix_sync_user_files 'f' "$PATH_DATA" "$DATA_FILES"
 	    rm --force "$PREFIX_LOCK"
 	}
 
