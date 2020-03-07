@@ -36,7 +36,7 @@ set -o errexit
 # send your bug reports to contact@dotslashplay.it
 ###
 
-script_version=20200510.2
+script_version=20200510.3
 
 # Set game-specific variables
 
@@ -64,17 +64,21 @@ ARCHIVE_GAME_MAIN_FILES='*.cfg *.dll *.ini dos4gw.exe language.exe relent.exe lo
 # Keep compatibility with old archives
 ARCHIVE_GAME_MAIN_PATH_GOG_OLD0='app'
 
-GAME_IMAGE='lba.dat'
+GAME_IMAGE='LBA.DAT'
 
-CONFIG_FILES='*.cfg *.ini'
+CONFIG_FILES='*.CFG *.INI'
 DATA_FILES='*.LBA'
 
+# shellcheck disable=SC2016
+PREFIX_PREPARE='# Keep compatibility with pre-2.13 scripts
+userdir_toupper_files "$PATH_CONFIG" "*.cfg *.ini"'
+
 APP_MAIN_TYPE='dosbox'
-APP_MAIN_EXE='relent.exe'
+APP_MAIN_EXE='RELENT.EXE'
 APP_MAIN_ICON='app/goggame-1207658971.ico'
 
 APP_SETUP_TYPE='dosbox'
-APP_SETUP_EXE='setup.exe'
+APP_SETUP_EXE='SETUP.EXE'
 APP_SETUP_ID="${GAME_ID}_setup"
 APP_SETUP_NAME="$GAME_NAME - Setup"
 APP_SETUP_CAT='Settings'
@@ -88,7 +92,7 @@ PKG_MAIN_PROVIDE='little-big-adventure-1-data'
 
 # Load common functions
 
-target_version='2.11'
+target_version='2.13'
 
 if [ -z "$PLAYIT_LIB2" ]; then
 	: "${XDG_DATA_HOME:="$HOME/.local/share"}"
@@ -118,6 +122,7 @@ fi
 
 extract_data_from "$SOURCE_ARCHIVE"
 prepare_package_layout
+toupper "$PKG_MAIN_PATH$PATH_GAME"
 
 # Extract icons
 
