@@ -37,7 +37,7 @@ set -o errexit
 # send your bug reports to vv221@dotslashplay.it
 ###
 
-script_version=20200307.2
+script_version=20200307.1
 
 # Set game-specific variables
 
@@ -65,17 +65,22 @@ ARCHIVE_GAME_MAIN_FILES='*.bat *.cfg *.dos *.exe *.ini drivers *.hqr *.ile *.obl
 # Keep compatibility with old archives
 ARCHIVE_GAME_MAIN_PATH_GOG_OLD0='app'
 
-GAME_IMAGE='lba2.dat'
+GAME_IMAGE='LBA2.DAT'
 
-CONFIG_FILES='*.cfg'
-DATA_DIRS='save vox'
+CONFIG_FILES='*.CFG'
+DATA_DIRS='SAVE VOX'
+
+# shellcheck disable=SC2016
+PREFIX_PREPARE='# Keep compatibility with pre-2.13 scripts
+userdir_toupper_files "$PATH_CONFIG" "*.cfg"
+userdir_toupper_files "$PATH_DATA" "save vox"'
 
 APP_MAIN_TYPE='dosbox'
-APP_MAIN_EXE='lba2.exe'
+APP_MAIN_EXE='LBA2.EXE'
 APP_MAIN_ICON='app/goggame-1207658974.ico'
 
 APP_SETUP_TYPE='dosbox'
-APP_SETUP_EXE='setup.exe'
+APP_SETUP_EXE='SETUP.EXE'
 APP_SETUP_ID="${GAME_ID}_setup"
 APP_SETUP_NAME="$GAME_NAME - Setup"
 APP_SETUP_CAT='Settings'
@@ -87,7 +92,7 @@ PKG_MAIN_DEPS='dosbox'
 
 # Load common functions
 
-target_version='2.12'
+target_version='2.13'
 
 if [ -z "$PLAYIT_LIB2" ]; then
 	: "${XDG_DATA_HOME:="$HOME/.local/share"}"
@@ -117,6 +122,7 @@ fi
 
 extract_data_from "$SOURCE_ARCHIVE"
 prepare_package_layout
+toupper "$PKG_MAIN_PATH$PATH_GAME"
 
 # Extract icons
 
@@ -125,7 +131,7 @@ rm --recursive "$PLAYIT_WORKDIR/gamedata"
 
 # Keep Voices on HD
 
-file="${PKG_MAIN_PATH}${PATH_GAME}/lba2.cfg"
+file="$PKG_MAIN_PATH$PATH_GAME/LBA2.CFG"
 pattern='s/\(FlagKeepVoice:\) OFF/\1 ON/'
 sed --in-place "$pattern" "$file"
 
