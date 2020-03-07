@@ -5,6 +5,7 @@ set -o errexit
 # Copyright (c) 2015-2020, Antoine "vv221/vv222" Le Gonidec
 # Copyright (c) 2016-2020, Mopi
 # Copyright (c) 2018-2020, Andrey Butirsky
+# Copyright (c) 2020, macaron
 # All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
@@ -36,7 +37,7 @@ set -o errexit
 # send your bug reports to vv221@dotslashplay.it
 ###
 
-script_version=20200307.1
+script_version=20200307.2
 
 # Set game-specific variables
 
@@ -72,6 +73,13 @@ DATA_DIRS='save vox'
 APP_MAIN_TYPE='dosbox'
 APP_MAIN_EXE='lba2.exe'
 APP_MAIN_ICON='app/goggame-1207658974.ico'
+
+APP_SETUP_TYPE='dosbox'
+APP_SETUP_EXE='setup.exe'
+APP_SETUP_ID="${GAME_ID}_setup"
+APP_SETUP_NAME="$GAME_NAME - Setup"
+APP_SETUP_CAT='Settings'
+APP_SETUP_ICON="$APP_MAIN_ICON"
 
 PACKAGES_LIST='PKG_MAIN'
 
@@ -112,7 +120,7 @@ prepare_package_layout
 
 # Extract icons
 
-icons_get_from_workdir 'APP_MAIN'
+icons_get_from_workdir 'APP_MAIN' 'APP_SETUP'
 rm --recursive "$PLAYIT_WORKDIR/gamedata"
 
 # Keep Voices on HD
@@ -123,7 +131,7 @@ sed --in-place "$pattern" "$file"
 
 # Write launchers
 
-launchers_write 'APP_MAIN'
+launchers_write 'APP_MAIN' 'APP_SETUP'
 
 # Build package
 
