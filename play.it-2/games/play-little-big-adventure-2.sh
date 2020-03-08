@@ -37,7 +37,7 @@ set -o errexit
 # send your bug reports to vv221@dotslashplay.it
 ###
 
-script_version=20200307.1
+script_version=20200308.1
 
 # Set game-specific variables
 
@@ -68,12 +68,12 @@ ARCHIVE_GAME_MAIN_PATH_GOG_OLD0='app'
 GAME_IMAGE='LBA2.DAT'
 
 CONFIG_FILES='*.CFG'
-DATA_DIRS='SAVE VOX'
+DATA_DIRS='SAVE'
 
 # shellcheck disable=SC2016
 PREFIX_PREPARE='# Keep compatibility with pre-2.13 scripts
 userdir_toupper_files "$PATH_CONFIG" "*.cfg"
-userdir_toupper_files "$PATH_DATA" "save vox"'
+userdir_toupper_files "$PATH_DATA" "save"'
 
 APP_MAIN_TYPE='dosbox'
 APP_MAIN_EXE='LBA2.EXE'
