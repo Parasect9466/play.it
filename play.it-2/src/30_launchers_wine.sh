@@ -21,10 +21,7 @@ launcher_write_script_wine_application_variables() {
 
 	APP_EXE='$application_exe'
 	APP_OPTIONS="$application_options"
-	APP_WINE_USER_CONFIG='$APP_WINE_USER_CONFIG'
-	APP_WINE_USER_DATA='$APP_WINE_USER_DATA'
-	APP_WINE_PUBLIC_CONFIG='$APP_WINE_PUBLIC_CONFIG'
-	APP_WINE_PUBLIC_DATA='$APP_WINE_PUBLIC_DATA'
+	APP_WINE_LINK_DIRS="$APP_WINE_LINK_DIRS"
 
 	EOF
 	return 0
@@ -147,48 +144,26 @@ launcher_write_script_wine_prefix_build() {
 	        fi
 	    done
 	)
-	if [ -n "$APP_WINE_USER_CONFIG" ]; then
-	    CONFIG_DIRS="$CONFIG_DIRS ./userconfig"
-	    user_config_path="$WINEPREFIX/drive_c/users/$(whoami)/$APP_WINE_USER_CONFIG"
-	    if [ ! -e "$user_config_path" ]; then
-	        mkdir --parents "$(dirname "$user_config_path")"
-	        mkdir --parents "$PATH_CONFIG/userconfig"
-	        ln --symbolic "$PATH_CONFIG/userconfig" "$user_config_path"
-	    fi
-	fi
-	if [ -n "$APP_WINE_USER_DATA" ]; then
-	    DATA_DIRS="$DATA_DIRS ./userdata"
-	    user_data_path="$WINEPREFIX/drive_c/users/$(whoami)/$APP_WINE_USER_DATA"
-	    if [ ! -e "$user_data_path" ]; then
-	        mkdir --parents "$(dirname "$user_data_path")"
-	        mkdir --parents "$PATH_DATA/userdata"
-	        ln --symbolic "$PATH_DATA/userdata" "$user_data_path"
-	    fi
-	fi
-	if [ -n "$APP_WINE_PUBLIC_CONFIG" ]; then
-	    CONFIG_DIRS="$CONFIG_DIRS ./publicconfig"
-	    public_config_path="$WINEPREFIX/drive_c/users/Public/$APP_WINE_PUBLIC_CONFIG"
-	    if [ ! -e "$public_config_path" ]; then
-	        mkdir --parents "$(dirname "$public_config_path")"
-	        mkdir --parents "$PATH_CONFIG/publicconfig"
-	        ln --symbolic "$PATH_CONFIG/publicconfig" "$public_config_path"
-	    fi
-	fi
-	if [ -n "$APP_WINE_PUBLIC_DATA" ]; then
-	    DATA_DIRS="$DATA_DIRS ./publicdata"
-	    public_data_path="$WINEPREFIX/drive_c/users/Public/$APP_WINE_PUBLIC_DATA"
-	    if [ ! -e "$public_data_path" ]; then
-	        mkdir --parents "$(dirname "$public_data_path")"
-	        mkdir --parents "$PATH_DATA/publicdata"
-	        ln --symbolic "$PATH_DATA/publicdata" "$public_data_path"
-	    fi
-	fi
 	init_userdir_files "$PATH_CONFIG" "$CONFIG_FILES"
 	init_userdir_files "$PATH_DATA" "$DATA_FILES"
 	init_prefix_files "$PATH_CONFIG" "$CONFIG_FILES"
 	init_prefix_files "$PATH_DATA" "$DATA_FILES"
 	init_prefix_dirs "$PATH_CONFIG" "$CONFIG_DIRS"
 	init_prefix_dirs "$PATH_DATA" "$DATA_DIRS"
+	echo "$APP_WINE_LINK_DIRS" | grep ':' | while read -r line; do
+	    prefix_dir="$PATH_PREFIX/${line%%:*}"
+	    wine_dir="$WINEPREFIX/drive_c/${line#*:}"
+	    if [ ! -d "$prefix_dir" ]; then
+	        mkdir --parents "$prefix_dir"
+	    fi
+	    if [ ! -h "$wine_dir" ]; then
+	        if [ -d "$wine_dir" ]; then
+	            mv --no-target-directory "$wine_dir" "$prefix_dir"
+	        fi
+	        mkdir --parents "$(dirname "$wine_dir")"
+	        ln --symbolic "$prefix_dir" "$wine_dir"
+	    fi
+	done
 
 	EOF
 	sed --in-place 's/    /\t/g' "$file"
