@@ -35,7 +35,7 @@ set -o errexit
 # send your bug reports to vv221@dotslashplay.it
 ###
 
-script_version=20200310.1
+script_version=20200313.1
 
 # Set game-specific variables
 
@@ -52,14 +52,16 @@ ARCHIVE_GOG_PART1='setup_monkey_island_1_se_1.0_(18587)-1.bin'
 ARCHIVE_GOG_PART1_MD5='6a3ca78328b99ae0d9d0a3d7a4fb3cd9'
 ARCHIVE_GOG_PART1_TYPE='innosetup'
 
-ARCHIVE_DOC_DATA_PATH='app'
-ARCHIVE_DOC_DATA_FILES='*.pdf'
-
-ARCHIVE_GAME_BIN_PATH='app'
-ARCHIVE_GAME_BIN_FILES='mise.exe language.exe'
+ARCHIVE_DOC0_DATA_PATH='app'
+ARCHIVE_DOC0_DATA_FILES='*.pdf'
+ARCHIVE_DOC1_DATA_PATH='tmp'
+ARCHIVE_DOC1_DATA_FILES='eula_*.txt'
 
 ARCHIVE_GAME_DATA_PATH='app'
 ARCHIVE_GAME_DATA_FILES='monkey1.pak audio localization'
+
+ARCHIVE_GAME_BIN_PATH='app'
+ARCHIVE_GAME_BIN_FILES='mise.exe language.exe'
 
 APP_WINE_LINK_DIRS='userdata:users/$(whoami)/Application Data/LucasArts/The Secret of Monkey Island Special Edition'
 
