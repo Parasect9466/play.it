@@ -35,7 +35,7 @@ set -o errexit
 # send your bug reports to contact@dotslashplay.it
 ###
 
-script_version=20200317.2
+script_version=20200317.3
 
 # Set game-specific variables
 
@@ -65,19 +65,7 @@ ARCHIVE_GAME_DATA_FILES='Dex_Data'
 
 DATA_DIRS='./logs'
 
-APP_MAIN_TYPE='native'
-# shellcheck disable=SC2016
-APP_MAIN_PRERUN='if ! command -v pulseaudio >/dev/null 2>&1; then
-	mkdir --parents libs
-	ln --force --symbolic /dev/null libs/libpulse-simple.so.0
-	export LD_LIBRARY_PATH="libs:$LD_LIBRARY_PATH"
-else
-	if [ -e "libs/libpulse-simple.so.0" ]; then
-		rm libs/libpulse-simple.so.0
-		rmdir --ignore-fail-on-non-empty libs
-	fi
-	pulseaudio --start
-fi'
+APP_MAIN_TYPE='unity3d'
 APP_MAIN_EXE='Dex.x86'
 # shellcheck disable=SC2016
 APP_MAIN_OPTIONS='-logFile ./logs/$(date +%F-%R).log'
