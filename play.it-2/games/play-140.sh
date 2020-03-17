@@ -1,4 +1,4 @@
-#!/bin/sh -e
+#!/bin/sh
 set -o errexit
 
 ###
@@ -32,10 +32,10 @@ set -o errexit
 ###
 # 140
 # build native packages from the original installers
-# send your bug reports to vv221@dotslashplay.it
+# send your bug reports to contact@dotslashplay.it
 ###
 
-script_version=20181002.3
+script_version=20200317.1
 
 # Set game-specific variables
 
@@ -82,21 +82,27 @@ ARCHIVE_HUMBLE_OLD0_VERSION='2.0-humble160914'
 
 ARCHIVE_GAME_BIN32_PATH_GOG='data/noarch/game'
 ARCHIVE_GAME_BIN32_PATH_HUMBLE='.'
-ARCHIVE_GAME_BIN32_FILES='*.x86 *_Data/*/x86'
+ARCHIVE_GAME_BIN32_FILES='140Linux.x86 140Linux_Data/Mono/x86 140Linux_Data/Plugins/x86'
 # Keep compatibility with old versions
 ARCHIVE_GAME_BIN32_PATH_HUMBLE_OLD1='linux'
+ARCHIVE_GAME_BIN32_FILES_GOG_OLD0='140.x86 140_Data/Mono/x86 140_Data/Plugins/x86'
+ARCHIVE_GAME_BIN32_FILES_HUMBLE_OLD0='140.x86 140_Data/Mono/x86 140_Data/Plugins/x86'
 
 ARCHIVE_GAME_BIN64_PATH_GOG='data/noarch/game'
 ARCHIVE_GAME_BIN64_PATH_HUMBLE='.'
-ARCHIVE_GAME_BIN64_FILES='*.x86_64 *_Data/*/x86_64'
+ARCHIVE_GAME_BIN64_FILES='140Linux.x86_64 140Linux_Data/Mono/x86_64 140Linux_Data/Plugins/x86_64'
 # Keep compatibility with old versions
 ARCHIVE_GAME_BIN64_PATH_HUMBLE_OLD1='linux'
+ARCHIVE_GAME_BIN64_FILES_GOG_OLD0='140.x86_64 140_Data/Mono/x86_64 140_Data/Plugins/x86_64'
+ARCHIVE_GAME_BIN64_FILES_HUMBLE_OLD0='140.x86_64 140_Data/Mono/x86_64 140_Data/Plugins/x86_64'
 
 ARCHIVE_GAME_DATA_PATH_GOG='data/noarch/game'
 ARCHIVE_GAME_DATA_PATH_HUMBLE='.'
-ARCHIVE_GAME_DATA_FILES='*_Data'
+ARCHIVE_GAME_DATA_FILES='140Linux_Data'
 # Keep compatibility with old versions
 ARCHIVE_GAME_DATA_PATH_HUMBLE_OLD1='linux'
+ARCHIVE_GAME_DATA_FILES_GOG_OLD0='140_Data'
+ARCHIVE_GAME_DATA_FILES_HUMBLE_OLD0='140_Data'
 
 DATA_DIRS='./logs'
 DATA_FILES='./140.sav'
@@ -128,7 +134,7 @@ PKG_BIN64_DEPS="$PKG_BIN32_DEPS"
 
 # Load common functions
 
-target_version='2.10'
+target_version='2.11'
 
 if [ -z "$PLAYIT_LIB2" ]; then
 	: "${XDG_DATA_HOME:="$HOME/.local/share"}"
@@ -151,7 +157,7 @@ if [ -z "$PLAYIT_LIB2" ]; then
 	printf 'libplayit2.sh not found.\n'
 	exit 1
 fi
-#shellcheck source=play.it-2/lib/libplayit2.sh
+# shellcheck source=play.it-2/lib/libplayit2.sh
 . "$PLAYIT_LIB2"
 
 # Extract game data
@@ -160,22 +166,23 @@ extract_data_from "$SOURCE_ARCHIVE"
 prepare_package_layout
 rm --recursive "$PLAYIT_WORKDIR/gamedata"
 
+# Get game icon
+
+PKG='PKG_DATA'
+icons_get_from_package 'APP_MAIN'
+
 # Write launchers
 
 use_archive_specific_value 'APP_MAIN_EXE_BIN32'
 use_archive_specific_value 'APP_MAIN_EXE_BIN64'
 use_archive_specific_value 'APP_MAIN_ICON'
-
 for PKG in 'PKG_BIN32' 'PKG_BIN64'; do
-	write_launcher 'APP_MAIN'
+	launchers_write 'APP_MAIN'
 done
 
 # Build package
 
-PKG='PKG_DATA'
-icons_linking_postinst 'APP_MAIN'
-write_metadata 'PKG_DATA'
-write_metadata 'PKG_BIN32' 'PKG_BIN64'
+write_metadata
 build_pkg
 
 # Clean up
