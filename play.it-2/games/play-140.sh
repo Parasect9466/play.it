@@ -35,7 +35,7 @@ set -o errexit
 # send your bug reports to contact@dotslashplay.it
 ###
 
-script_version=20200317.3
+script_version=20200317.4
 
 # Set game-specific variables
 
@@ -104,14 +104,11 @@ ARCHIVE_GAME_DATA_PATH_HUMBLE_OLD1='linux'
 ARCHIVE_GAME_DATA_FILES_GOG_OLD0='140_Data'
 ARCHIVE_GAME_DATA_FILES_HUMBLE_OLD0='140_Data'
 
-DATA_DIRS='./logs'
 DATA_FILES='./140.sav'
 
 APP_MAIN_TYPE='unity3d'
 APP_MAIN_EXE_BIN32='140Linux.x86'
 APP_MAIN_EXE_BIN64='140Linux.x86_64'
-# shellcheck disable=SC2016
-APP_MAIN_OPTIONS='-logFile ./logs/$(date +%F-%R).log'
 APP_MAIN_ICON='140Linux_Data/Resources/UnityPlayer.png'
 # Keep compatibility with old versions
 APP_MAIN_EXE_BIN32_GOG_OLD0='140.x86'
