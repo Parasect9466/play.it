@@ -1,4 +1,4 @@
-#!/bin/sh -e
+#!/bin/sh
 set -o errexit
 
 ###
@@ -32,10 +32,10 @@ set -o errexit
 ###
 # Binaries
 # build native packages from the original installers
-# send your bug reports to vv221@dotslashplay.it
+# send your bug reports to contact@dotslashplay.it
 ###
 
-script_version=20181001.3
+script_version=20200317.1
 
 # Set game-specific variables
 
@@ -49,13 +49,13 @@ ARCHIVE_HUMBLE_SIZE='470000'
 ARCHIVE_HUMBLE_VERSION='1.1.0-humble1'
 
 ARCHIVE_GAME_BIN32_PATH='.'
-ARCHIVE_GAME_BIN32_FILES='*.x86 *_Data/*/x86'
+ARCHIVE_GAME_BIN32_FILES='Binaries.x86 Binaries_Data/Mono/x86 Binaries_Data/Plugins/x86'
 
 ARCHIVE_GAME_BIN64_PATH='.'
-ARCHIVE_GAME_BIN64_FILES='*.x86_64 *_Data/*/x86_64'
+ARCHIVE_GAME_BIN64_FILES='Binaries.x86_64 Binaries_Data/Mono/x86_64 Binaries_Data/Plugins/x86_64'
 
 ARCHIVE_GAME_DATA_PATH='.'
-ARCHIVE_GAME_DATA_FILES='*_Data'
+ARCHIVE_GAME_DATA_FILES='Binaries_Data'
 
 DATA_DIRS='./logs'
 
@@ -79,7 +79,7 @@ PKG_BIN64_DEPS="$PKG_BIN32_DEPS"
 
 # Load common functions
 
-target_version='2.10'
+target_version='2.11'
 
 if [ -z "$PLAYIT_LIB2" ]; then
 	: "${XDG_DATA_HOME:="$HOME/.local/share"}"
@@ -102,7 +102,7 @@ if [ -z "$PLAYIT_LIB2" ]; then
 	printf 'libplayit2.sh not found.\n'
 	exit 1
 fi
-#shellcheck source=play.it-2/lib/libplayit2.sh
+# shellcheck source=play.it-2/lib/libplayit2.sh
 . "$PLAYIT_LIB2"
 
 # Extract game data
@@ -111,18 +111,20 @@ extract_data_from "$SOURCE_ARCHIVE"
 prepare_package_layout
 rm --recursive "$PLAYIT_WORKDIR/gamedata"
 
+# Get game icon
+
+PKG='PKG_DATA'
+icons_get_from_package 'APP_MAIN'
+
 # Write launchers
 
 for PKG in 'PKG_BIN32' 'PKG_BIN64'; do
-	write_launcher 'APP_MAIN'
+	launchers_write 'APP_MAIN'
 done
 
 # Build package
 
-PKG='PKG_DATA'
-icons_linking_postinst 'APP_MAIN'
-write_metadata 'PKG_DATA'
-write_metadata 'PKG_BIN32' 'PKG_BIN64'
+write_metadata
 build_pkg
 
 # Clean up
