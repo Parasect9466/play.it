@@ -123,6 +123,15 @@ launcher_write_script() {
 			launcher_write_script_game_variables "$target_file"
 			launcher_write_script_scummvm_run "$application" "$target_file"
 		;;
+		('unity3d')
+			launcher_write_script_native_application_variables "$application" "$target_file"
+			launcher_write_script_game_variables "$target_file"
+			launcher_write_script_user_files "$target_file"
+			launcher_write_script_prefix_variables "$target_file"
+			launcher_write_script_prefix_functions "$target_file"
+			launcher_write_script_prefix_build "$target_file"
+			launcher_unity3d_run "$application" "$target_file"
+		;;
 		('wine')
 			if [ "$application_id" != "${GAME_ID}_winecfg" ]; then
 				launcher_write_script_wine_application_variables "$application" "$target_file"
@@ -148,7 +157,7 @@ launcher_write_script() {
 
 	# for native applications, add execution permissions to the game binary file
 	case "$application_type" in
-		('native'*)
+		('native'*|'unity3d')
 			local application_exe
 			use_package_specific_value "${application}_EXE"
 			application_exe="$(get_value "${application}_EXE")"
