@@ -35,7 +35,7 @@ set -o errexit
 # send your bug reports to contact@dotslashplay.it
 ###
 
-script_version=20200317.2
+script_version=20200317.3
 
 # Set game-specific variables
 
@@ -57,13 +57,9 @@ ARCHIVE_GAME_BIN64_FILES='Binaries.x86_64 Binaries_Data/Mono/x86_64 Binaries_Dat
 ARCHIVE_GAME_DATA_PATH='.'
 ARCHIVE_GAME_DATA_FILES='Binaries_Data'
 
-DATA_DIRS='./logs'
-
-APP_MAIN_TYPE='native'
+APP_MAIN_TYPE='unity3d'
 APP_MAIN_EXE_BIN32='Binaries.x86'
 APP_MAIN_EXE_BIN64='Binaries.x86_64'
-# shellcheck disable=SC2016
-APP_MAIN_OPTIONS='-logFile ./logs/$(date +%F-%R).log'
 APP_MAIN_ICON='Binaries_Data/Resources/UnityPlayer.png'
 
 PACKAGES_LIST='PKG_BIN32 PKG_BIN64 PKG_DATA'
