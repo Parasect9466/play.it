@@ -35,7 +35,7 @@ set -o errexit
 # send your bug reports to contact@dotslashplay.it
 ###
 
-script_version=20200317.3
+script_version=20200317.4
 
 # Set game-specific variables
 
@@ -63,12 +63,8 @@ ARCHIVE_GAME_BIN_FILES='Dex.x86 Dex_Data/Mono Dex_Data/Plugins'
 ARCHIVE_GAME_DATA_PATH='data/noarch/game'
 ARCHIVE_GAME_DATA_FILES='Dex_Data'
 
-DATA_DIRS='./logs'
-
 APP_MAIN_TYPE='unity3d'
 APP_MAIN_EXE='Dex.x86'
-# shellcheck disable=SC2016
-APP_MAIN_OPTIONS='-logFile ./logs/$(date +%F-%R).log'
 APP_MAIN_ICON='Dex_Data/Resources/UnityPlayer.png'
 
 PACKAGES_LIST='PKG_BIN PKG_DATA'
