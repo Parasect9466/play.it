@@ -35,7 +35,7 @@ set -o errexit
 # send your bug reports to contact@dotslashplay.it
 ###
 
-script_version=20200317.2
+script_version=20200317.3
 
 # Set game-specific variables
 
@@ -107,7 +107,7 @@ ARCHIVE_GAME_DATA_FILES_HUMBLE_OLD0='140_Data'
 DATA_DIRS='./logs'
 DATA_FILES='./140.sav'
 
-APP_MAIN_TYPE='native'
+APP_MAIN_TYPE='unity3d'
 APP_MAIN_EXE_BIN32='140Linux.x86'
 APP_MAIN_EXE_BIN64='140Linux.x86_64'
 # shellcheck disable=SC2016
