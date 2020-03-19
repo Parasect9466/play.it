@@ -34,7 +34,7 @@ set -o errexit
 # send your bug reports to contact@dotslashplay.it
 ###
 
-script_version=20200319.1
+script_version=20200319.2
 
 # Set game-specific variables
 
@@ -79,6 +79,7 @@ ARCHIVE_GAME_DATA_FILES='manowarcorsair_data mowdata'
 
 APP_MAIN_TYPE='wine'
 APP_MAIN_EXE='manowarcorsair.exe'
+APP_MAIN_OPTIONS='-force-opengl'
 APP_MAIN_ICON='manowarcorsair.exe'
 
 PACKAGES_LIST='PKG_MODELS_LAND PKG_MODELS PKG_TERRAIN1 PKG_TERRAIN2 PKG_DATA PKG_BIN'
