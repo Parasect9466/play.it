@@ -34,7 +34,7 @@ set -o errexit
 # send your bug reports to contact@dotslashplay.it
 ###
 
-script_version=20200320.1
+script_version=20200320.2
 
 # Set game-specific variables
 
@@ -52,17 +52,18 @@ ARCHIVE_DOC_DATA_PATH='data/noarch/game'
 ARCHIVE_DOC_DATA_FILES='*.txt'
 
 ARCHIVE_GAME_BIN32_PATH='data/noarch/game'
-ARCHIVE_GAME_BIN32_FILES='Lightning.bin.x86 lib'
+ARCHIVE_GAME_BIN32_FILES='lib'
 
 ARCHIVE_GAME_BIN64_PATH='data/noarch/game'
-ARCHIVE_GAME_BIN64_FILES='Lightning.bin.x86_64 lib64'
+ARCHIVE_GAME_BIN64_FILES='lib64'
 
 ARCHIVE_GAME_DATA_PATH='data/noarch/game'
-ARCHIVE_GAME_DATA_FILES='*.dll *.exe *.exe.config mono* Content PackedContent'
+ARCHIVE_GAME_DATA_FILES='Content PackedContent monoconfig monomachineconfig Lightning.exe Lightning.exe.config Ionic.Zip.Reduced.dll Steamworks.NET.dll'
 
-APP_MAIN_TYPE='native'
-APP_MAIN_EXE_BIN32='Lightning.bin.x86'
-APP_MAIN_EXE_BIN64='Lightning.bin.x86_64'
+APP_MAIN_TYPE='mono'
+APP_MAIN_LIBS_BIN32='lib'
+APP_MAIN_LIBS_BIN64='lib64'
+APP_MAIN_EXE='Lightning.exe'
 APP_MAIN_ICON='Content/icon.png'
 
 PACKAGES_LIST='PKG_BIN32 PKG_BIN64 PKG_DATA'
@@ -71,14 +72,20 @@ PKG_DATA_ID="${GAME_ID}-data"
 PKG_DATA_DESCRIPTION='data'
 
 PKG_BIN32_ARCH='32'
-PKG_BIN32_DEPS="$PKG_DATA_ID glibc libstdc++"
+PKG_BIN32_DEPS="$PKG_DATA_ID mono sdl2 vorbis glx"
+PKG_BIN32_DEPS_ARCH='' # TODO
+PKG_BIN32_DEPS_DEB='libmono-posix4.0-cil, libmono-security4.0-cil, libmono-system4.0-cil, libmono-system-configuration4.0-cil, libmono-system-core4.0-cil, libmono-system-data4.0-cil, libmono-system-drawing4.0-cil, libmono-system-security4.0-cil, libmono-system-web4.0-cil, libmono-system-web-extensions4.0-cil, libmono-system-web-http4.0-cil, libmono-system-web-services4.0-cil, libmono-system-xml4.0-cil'
+PKG_BIN32_DEPS_GENTOO='' # TODO
 
 PKG_BIN64_ARCH='64'
 PKG_BIN64_DEPS="$PKG_BIN32_DEPS"
+PKG_BIN64_DEPS_ARCH='' # TODO
+PKG_BIN64_DEPS_DEB="$PKG_BIN32_DEPS_DEB"
+PKG_BIN64_DEPS_GENTOO='' # TODO
 
 # Load common functions
 
-target_version='2.11'
+target_version='2.12'
 
 if [ -z "$PLAYIT_LIB2" ]; then
 	: "${XDG_DATA_HOME:="$HOME/.local/share"}"
