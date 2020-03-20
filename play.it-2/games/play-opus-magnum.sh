@@ -31,10 +31,10 @@ set -o errexit
 ###
 # Opus Magnum
 # build native packages from the original installers
-# send your bug reports to vv221@dotslashplay.it
+# send your bug reports to contact@dotslashplay.it
 ###
 
-script_version=20181228.1
+script_version=20200320.1
 
 # Set game-specific variables
 
@@ -48,11 +48,8 @@ ARCHIVE_GOG_MD5='dbe5137d4b7e2edd21f4117a80756872'
 ARCHIVE_GOG_SIZE='460000'
 ARCHIVE_GOG_VERSION='2018.08.17-gog23270'
 
-ARCHIVE_DOC0_DATA_PATH='data/noarch/docs'
-ARCHIVE_DOC0_DATA_FILES='*'
-
-ARCHIVE_DOC1_DATA_PATH='data/noarch/game'
-ARCHIVE_DOC1_DATA_FILES='*.txt'
+ARCHIVE_DOC_DATA_PATH='data/noarch/game'
+ARCHIVE_DOC_DATA_FILES='*.txt'
 
 ARCHIVE_GAME_BIN32_PATH='data/noarch/game'
 ARCHIVE_GAME_BIN32_FILES='Lightning.bin.x86 lib'
@@ -66,7 +63,7 @@ ARCHIVE_GAME_DATA_FILES='*.dll *.exe *.exe.config mono* Content PackedContent'
 APP_MAIN_TYPE='native'
 APP_MAIN_EXE_BIN32='Lightning.bin.x86'
 APP_MAIN_EXE_BIN64='Lightning.bin.x86_64'
-APP_MAIN_ICON='data/noarch/support/icon.png'
+APP_MAIN_ICON='Content/icon.png'
 
 PACKAGES_LIST='PKG_BIN32 PKG_BIN64 PKG_DATA'
 
@@ -81,7 +78,7 @@ PKG_BIN64_DEPS="$PKG_BIN32_DEPS"
 
 # Load common functions
 
-target_version='2.10'
+target_version='2.11'
 
 if [ -z "$PLAYIT_LIB2" ]; then
 	: "${XDG_DATA_HOME:="$HOME/.local/share"}"
@@ -111,17 +108,17 @@ fi
 
 extract_data_from "$SOURCE_ARCHIVE"
 prepare_package_layout
+rm --recursive "$PLAYIT_WORKDIR/gamedata"
 
 # Extract icon
 
 PKG='PKG_DATA'
-icons_get_from_workdir 'APP_MAIN'
-rm --recursive "$PLAYIT_WORKDIR/gamedata"
+icons_get_from_package 'APP_MAIN'
 
 # Write launchers
 
 for PKG in 'PKG_BIN32' 'PKG_BIN64'; do
-	write_launcher 'APP_MAIN'
+	launchers_write 'APP_MAIN'
 done
 
 # Build package
