@@ -35,7 +35,7 @@ set -o errexit
 # send your bug reports to contact@dotslashplay.it
 ###
 
-script_version=20200401.1
+script_version=20200401.2
 
 # Set game-specific variables
 
@@ -108,13 +108,9 @@ ARCHIVE_GAME_DATA_FILES='MonsterProm_Data UserData'
 
 DATA_DIRS='./logs ./UserData'
 
-APP_MAIN_TYPE='native'
-# shellcheck disable=SC2016
-APP_MAIN_PRERUN='export LANG=C'
+APP_MAIN_TYPE='unity3d'
 APP_MAIN_EXE_BIN32='MonsterProm.x86'
 APP_MAIN_EXE_BIN64='MonsterProm.x86_64'
-# shellcheck disable=SC2016
-APP_MAIN_OPTIONS='-logFile ./logs/$(date +%F-%R).log'
 APP_MAIN_ICON='MonsterProm_Data/Resources/UnityPlayer.png'
 
 PACKAGES_LIST='PKG_BIN32 PKG_BIN64 PKG_DATA'
