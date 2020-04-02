@@ -4,6 +4,7 @@ set -o errexit
 ###
 # Copyright (c) 2015-2020, Antoine "vv221/vv222" Le Gonidec
 # Copyright (c) 2016-2020, Mopi
+# Copyright (c) 2020, Alarig Le Lay
 # All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
@@ -42,11 +43,11 @@ script_version=20190520.3
 GAME_ID='mini-metro'
 GAME_NAME='Mini Metro'
 
-ARCHIVE_HUMBLE='MiniMetro-release-38-linux.tar.gz'
+ARCHIVE_HUMBLE='MiniMetro-release-41-linux.tar.gz'
 ARCHIVE_HUMBLE_URL='https://www.humblebundle.com/store/mini-metro'
-ARCHIVE_HUMBLE_MD5='1535053549257fd3139a46ed91c193a4'
-ARCHIVE_HUMBLE_VERSION='1.38-humble181120'
-ARCHIVE_HUMBLE_SIZE='320000'
+ARCHIVE_HUMBLE_MD5='01f6f15ba835e1c54e52df90ff890408'
+ARCHIVE_HUMBLE_VERSION='1.41-humble'
+ARCHIVE_HUMBLE_SIZE='310000'
 
 ARCHIVE_HUMBLE_OLD3='MiniMetro-release-37a-linux.tar.gz'
 ARCHIVE_HUMBLE_OLD3_MD5='879d12ce7255feebf7406f65519112dd'
