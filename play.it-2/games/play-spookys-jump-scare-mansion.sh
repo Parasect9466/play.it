@@ -35,7 +35,7 @@ set -o errexit
 # send your bug reports to vv221@dotslashplay.it
 ###
 
-script_version=20200405.2
+script_version=20200405.3
 
 # Set game-specific variables
 
@@ -49,21 +49,21 @@ ARCHIVE_INDIEDB_VERSION='3.0.1-indiedb'
 ARCHIVE_INDIEDB_SIZE='330000'
 
 ARCHIVE_DOC_DATA_PATH='.'
-ARCHIVE_DOC_DATA_FILES='ReadMe.txt'
+ARCHIVE_DOC_DATA_FILES='readme.txt'
 
 ARCHIVE_GAME_BIN_PATH='.'
-ARCHIVE_GAME_BIN_FILES='SPOOKY.exe SurfaceFix.dll'
+ARCHIVE_GAME_BIN_FILES='spooky.exe surfacefix.dll'
 
 ARCHIVE_GAME_DATA_PATH='.'
-ARCHIVE_GAME_DATA_FILES='DATA *.ini'
+ARCHIVE_GAME_DATA_FILES='data *.ini'
 
 DATA_FILES='./*.ini'
 
 APP_WINETRICKS='directmusic' # Wasn't necessary on an ubuntu 18.04.3 live USB with wine 3.0
 
 APP_MAIN_TYPE='wine'
-APP_MAIN_EXE='SPOOKY.exe'
-APP_MAIN_ICON='SPOOKY.exe'
+APP_MAIN_EXE='spooky.exe'
+APP_MAIN_ICON='spooky.exe'
 
 PACKAGES_LIST='PKG_BIN PKG_DATA'
 
@@ -104,6 +104,7 @@ fi
 # Extract game data
 
 extract_data_from "$SOURCE_ARCHIVE"
+tolower "$PLAYIT_WORKDIR/gamedata"
 prepare_package_layout
 rm --recursive "$PLAYIT_WORKDIR/gamedata"
 
