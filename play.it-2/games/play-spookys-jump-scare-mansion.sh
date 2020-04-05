@@ -1,4 +1,4 @@
-#!/bin/sh -e
+#!/bin/sh
 set -o errexit
 
 ###
@@ -30,26 +30,23 @@ set -o errexit
 ###
 
 ###
-# Spooky's Jump Scare Mansion
+# Spookyʼs Jump Scare Mansion
 # build native packages from the original installers
 # send your bug reports to vv221@dotslashplay.it
 ###
 
-script_version=20200405.1
+script_version=20200405.2
 
 # Set game-specific variables
 
 GAME_ID='spookys-jump-scare-mansion'
-GAME_NAME='Spooky’s Jump Scare Mansion'
+GAME_NAME='Spookyʼs Jump Scare Mansion'
 
 ARCHIVE_INDIEDB='SPOOKY.1.zip'
 ARCHIVE_INDIEDB_URL='https://www.indiedb.com/games/spookys-house-of-jump-scares/downloads/spookys-house-of-jump-scares-30'
 ARCHIVE_INDIEDB_MD5='250f389a217169e89fd7ee4794a9831d'
 ARCHIVE_INDIEDB_VERSION='3.0.1-indiedb'
 ARCHIVE_INDIEDB_SIZE='330000'
-ARCHIVE_INDIEDB_TYPE='zip'
-
-DATA_FILES='*.ini'
 
 ARCHIVE_DOC_DATA_PATH='.'
 ARCHIVE_DOC_DATA_FILES='ReadMe.txt'
@@ -59,6 +56,8 @@ ARCHIVE_GAME_BIN_FILES='SPOOKY.exe SurfaceFix.dll'
 
 ARCHIVE_GAME_DATA_PATH='.'
 ARCHIVE_GAME_DATA_FILES='DATA *.ini'
+
+DATA_FILES='./*.ini'
 
 APP_WINETRICKS='directmusic' # Wasn't necessary on an ubuntu 18.04.3 live USB with wine 3.0
 
@@ -76,7 +75,7 @@ PKG_BIN_DEPS="$PKG_DATA_ID wine winetricks"
 
 # Load common functions
 
-target_version='2.10'
+target_version='2.11'
 
 if [ -z "$PLAYIT_LIB2" ]; then
 	: "${XDG_DATA_HOME:="$HOME/.local/share"}"
@@ -99,7 +98,7 @@ if [ -z "$PLAYIT_LIB2" ]; then
 	printf 'libplayit2.sh not found.\n'
 	exit 1
 fi
-#shellcheck source=play.it-2/lib/libplayit2.sh
+# shellcheck source=play.it-2/lib/libplayit2.sh
 . "$PLAYIT_LIB2"
 
 # Extract game data
@@ -117,7 +116,7 @@ icons_move_to 'PKG_DATA'
 # Write launchers
 
 PKG='PKG_BIN'
-write_launcher 'APP_MAIN'
+launchers_write 'APP_MAIN'
 
 # Build package
 
