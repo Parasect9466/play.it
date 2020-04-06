@@ -608,3 +608,24 @@ error_not_writable() {
 	return 1
 }
 
+# display an error when a function has been given an unexpected empty string
+# USAGE: error_empty_string $function $string
+error_empty_string() {
+	local message function string
+	function="$1"
+	string="$2"
+	case "${LANG%_*}" in
+		('fr')
+			message='Lʼargument "%s" fourni à la fonction "%s" ne doit pas être vide.\n'
+			message="$message"'Merci de signaler cette erreur sur notre outil de gestion de bugs : %s\n'
+		;;
+		('en'|*)
+			message='Argument "%s" as provided to function "%s" can not be empty.\n'
+			message="$message"'Please report this issue in our bug tracker: %s\n'
+		;;
+	esac
+	print_error
+	printf "$message" "$string" "$function" "$PLAYIT_BUG_TRACKER_URL"
+	return 1
+}
+
