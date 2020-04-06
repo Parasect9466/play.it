@@ -14,21 +14,8 @@ if [ "${0##*/}" != 'libplayit2.sh' ] && [ -z "$LIB_ONLY" ]; then
 	version_minor_target=$(printf '%s' "$target_version" | cut --delimiter='.' --fields=2)
 
 	if [ $version_major_library -ne $version_major_target ] || [ $version_minor_library -lt $version_minor_target ]; then
-		print_error
-		case "${LANG%_*}" in
-			('fr')
-				string1='Mauvaise version de libplayit2.sh\n'
-				string2='La version cible est : %s\n'
-			;;
-			('en'|*)
-				string1='Wrong version of libplayit2.sh\n'
-				string2='Target version is: %s\n'
-			;;
-		esac
-		printf "$string1"
 		# shellcheck disable=SC2154
-		printf "$string2" "$target_version"
-		exit 1
+		error_wrong_library_version "$target_version"
 	fi
 
 	# Set URLs for error messages
@@ -122,17 +109,7 @@ if [ "${0##*/}" != 'libplayit2.sh' ] && [ -z "$LIB_ONLY" ]; then
 				export NO_FREE_SPACE_CHECK
 			;;
 			('--'*)
-				print_error
-				case "${LANG%_*}" in
-					('fr')
-						string='Option inconnue : %s\n'
-					;;
-					('en'|*)
-						string='Unkown option: %s\n'
-					;;
-				esac
-				printf "$string" "$1"
-				return 1
+				error_option_unknown "$1"
 			;;
 			(*)
 				if [ -f "$1" ]; then
@@ -184,18 +161,7 @@ if [ "${0##*/}" != 'libplayit2.sh' ] && [ -z "$LIB_ONLY" ]; then
 		[ "$OPTION_PACKAGE" = 'deb' ] && \
 		[ "$OPTION_COMPRESSION" = 'bzip2' ]
 	then
-		print_error
-		case "${LANG%_*}" in
-			('fr')
-				# shellcheck disable=SC1112
-				string='Le mode de compression bzip2 n’est pas compatible avec la génération de paquets deb.'
-			;;
-			('en'|*)
-				string='bzip2 compression mode is not compatible with deb packages generation.'
-			;;
-		esac
-		printf '%s\n' "$string"
-		exit 1
+		error_compression_method_not_compatible 'bzip2' 'deb'
 	fi
 
 	# Do not allow none compression when building Gentoo packages
@@ -204,18 +170,7 @@ if [ "${0##*/}" != 'libplayit2.sh' ] && [ -z "$LIB_ONLY" ]; then
 		[ "$OPTION_PACKAGE" = 'gentoo' ] && \
 		[ "$OPTION_COMPRESSION" = 'none' ]
 	then
-		print_error
-		case "${LANG%_*}" in
-			('fr')
-				# shellcheck disable=SC1112
-				string='Le mode de compression none n’est pas compatible avec la génération de paquets gentoo.'
-			;;
-			('en'|*)
-				string='none compression mode is not compatible with gentoo packages generation.'
-			;;
-		esac
-		printf '%s\n' "$string"
-		exit 1
+		error_compression_method_not_compatible 'none' 'gentoo'
 	fi
 
 	# Restrict packages list to target architecture
