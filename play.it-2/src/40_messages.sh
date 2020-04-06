@@ -572,3 +572,21 @@ error_compression_method_not_compatible() {
 	return 1
 }
 
+# display an error when a given path is not a directory
+# USAGE: error_not_a_directory $path
+error_not_a_directory() {
+	local message path
+	path="$1"
+	case "${LANG%_*}" in
+		('fr')
+			message='"%s" nʼest pas un répertoire.\n'
+		;;
+		('en'|*)
+			message='"%s" is not a directory.\n'
+		;;
+	esac
+	print_error
+	printf "$message" "$path"
+	return 1
+}
+
