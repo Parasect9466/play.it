@@ -629,3 +629,24 @@ error_empty_string() {
 	return 1
 }
 
+# display an error when a required command is missing, but a function was expecting it to be available
+# USAGE: error_unavailable_command $function $command
+error_unavailable_command() {
+	local message function command
+	function="$1"
+	command="$2"
+	case "${LANG%_*}" in
+		('fr')
+			message='La commande "%s" nʼest pas disponible, mais elle est requise par la fonction "%s".\n'
+			message="$message"'Merci de signaler cette erreur sur notre outil de gestion de bugs : %s\n'
+		;;
+		('en'|*)
+			message='"%s" command is not available, but it is required by function "%s".\n'
+			message="$message"'Please report this issue in our bug tracker: %s\n'
+		;;
+	esac
+	print_error
+	printf "$message" "$command" "$function" "$PLAYIT_BUG_TRACKER_URL"
+	return 1
+}
+
