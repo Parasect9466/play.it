@@ -112,7 +112,7 @@ information_required_gentoo_overlays() {
 			message='\nYou may need the following overlays to install these packages: %s\n'
 		;;
 	esac
-	printf "$printf" "$overlays"
+	printf "$message" "$overlays"
 	return 0
 }
 
