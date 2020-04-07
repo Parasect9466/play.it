@@ -8,16 +8,16 @@ help() {
 	case "${LANG%_*}" in
 		('fr')
 			if [ "$script_name" = 'play.it' ]; then
-				message='\nUtilisation : % ARCHIVE [OPTION]…\n\n'
+				message='\nUtilisation : %s ARCHIVE [OPTION]…\n\n'
 			else
-				message='\nUtilisation : %s %s [OPTION]… [ARCHIVE]\n\n'
+				message='\nUtilisation : %s [OPTION]… [ARCHIVE]\n\n'
 			fi
 		;;
 		('en'|*)
 			if [ "$script_name" = 'play.it' ]; then
-				message='\nUsage: % ARCHIVE [OPTION]…\n\n'
+				message='\nUsage: %s ARCHIVE [OPTION]…\n\n'
 			else
-				message='\nUsage: %s %s [OPTION]… [ARCHIVE]\n\n'
+				message='\nUsage: %s [OPTION]… [ARCHIVE]\n\n'
 			fi
 		;;
 	esac
@@ -44,16 +44,16 @@ help() {
 	case "${LANG%_*}" in
 		('fr')
 			if [ -n "${ARCHIVES_LIST##* *}" ]; then
-				message='Ce script reconnaît les archives suivantes :\n'
-			else
 				message='Ce script reconnaît lʼarchive suivante :\n'
+			else
+				message='Ce script reconnaît les archives suivantes :\n'
 			fi
 		;;
 		('en'|*)
 			if [ -n "${ARCHIVES_LIST##* *}" ]; then
-				message='This script can work on the following archives:\n'
-			else
 				message='This script can work on the following archive:\n'
+			else
+				message='This script can work on the following archives:\n'
 			fi
 		;;
 	esac
