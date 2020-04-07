@@ -1,8 +1,5 @@
 # write launcher script
 # USAGE: launcher_write_script $app
-# NEEDED VARS: GAME_ID OPTION_ARCHITECTURE PACKAGES_LIST PATH_BIN
-# CALLS: error_missing_argument error_extra_arguments testvar liberror error_no_pkg skipping_pkg_warning missing_pkg_error launcher_write_script_headers launcher_write_script_prefix_functions launcher_write_script_wine_winecfg launcher_write_script_dosbox_application_variables launcher_write_script_native_application_variables launcher_write_script_scummvm_application_variables launcher_write_script_wine_application_variables launcher_write_script_prefix_functions launcher_write_script_prefix_build launcher_write_script_wine_prefix_build launcher_write_script_dosbox_run launcher_write_script_native_run launcher_write_script_nativenoprefix_run launcher_write_script_scummvm_run launcher_write_script_winecfg_run launcher_write_script_wine_run error_launcher_missing_binary
-# CALLED BY:
 launcher_write_script() {
 	# check that this has been called with exactly one argument
 	if [ "$#" -eq 0 ]; then
@@ -13,19 +10,21 @@ launcher_write_script() {
 
 	# check that $PKG is set
 	if [ -z "$PKG" ]; then
-		error_no_pkg 'launcher_write_script'
+		error_variable_not_set 'launcher_write_script' '$PKG'
 	fi
 
 	# skip any action if called for a package excluded for target architectures
 	if [ "$OPTION_ARCHITECTURE" != 'all' ] && [ -n "${PACKAGES_LIST##*$PKG*}" ]; then
-		skipping_pkg_warning 'launcher_write_script' "$PKG"
+		warning_skip_package 'launcher_write_script' "$PKG"
 		return 0
 	fi
 
 	# parse argument
 	local application
 	application="$1"
-	testvar "$application" 'APP' || liberror 'application' 'launcher_write_script'
+	if ! testvar "$application" 'APP'; then
+		error_invalid_argument 'application' 'launcher_write_script'
+	fi
 
 	# get application type
 	local application_type
@@ -36,7 +35,9 @@ launcher_write_script() {
 	local package_path
 	local target_file
 	package_path="$(get_value "${PKG}_PATH")"
-	[ -n "$package_path" ] || missing_pkg_error 'launcher_write_script' "$PKG"
+	if [ -z "$package_path" ]; then
+		error_invalid_argument 'PKG' 'launcher_write_script'
+	fi
 	application_id="$(get_value "${application}_ID")"
 	if [ -z "$application_id" ]; then
 		application_id="$GAME_ID"
@@ -416,7 +417,7 @@ launcher_write_script_postrun() {
 # write menu entry
 # USAGE: launcher_write_desktop $app
 # NEEDED VARS: OPTION_ARCHITECTURE PACKAGES_LIST GAME_ID GAME_NAME PATH_DESK PATH_BIN
-# CALLS: error_missing_argument error_extra_arguments error_no_pkg
+# CALLS: error_missing_argument error_extra_arguments
 launcher_write_desktop() {
 	# check that this has been called with exactly one argument
 	if [ "$#" -eq 0 ]; then
@@ -427,19 +428,21 @@ launcher_write_desktop() {
 
 	# check that $PKG is set
 	if [ -z "$PKG" ]; then
-		error_no_pkg 'launcher_write_desktop'
+		error_variable_not_set 'launcher_write_desktop' '$PKG'
 	fi
 
 	# skip any action if called for a package excluded for target architectures
 	if [ "$OPTION_ARCHITECTURE" != 'all' ] && [ -n "${PACKAGES_LIST##*$PKG*}" ]; then
-		skipping_pkg_warning 'launcher_write_desktop' "$PKG"
+		warning_skip_package 'launcher_write_desktop' "$PKG"
 		return 0
 	fi
 
 	# parse argument
 	local application
 	application="$1"
-	testvar "$application" 'APP' || liberror 'application' 'launcher_write_desktop'
+	if ! testvar "$application" 'APP'; then
+		error_invalid_argument 'application' 'launcher_write_desktop'
+	fi
 
 	# get application-specific values
 	local application_id
@@ -467,7 +470,9 @@ launcher_write_desktop() {
 	local package_path
 	local target_file
 	package_path="$(get_value "${PKG}_PATH")"
-	[ -n "$package_path" ] || missing_pkg_error 'launcher_write_desktop' "$PKG"
+	if [ -z "$package_path" ]; then
+		error_invalid_argument 'PKG' 'launcher_write_desktop'
+	fi
 	target_file="${package_path}${PATH_DESK}/${application_id}.desktop"
 
 	# include full binary path in Exec field if using non-standard installation prefix
@@ -520,7 +525,7 @@ launcher_write_desktop() {
 launcher_write() {
 	# skip any action if called for a package excluded for target architectures
 	if [ "$OPTION_ARCHITECTURE" != 'all' ] && [ -n "${PACKAGES_LIST##*$PKG*}" ]; then
-		skipping_pkg_warning 'launcher_write_script' "$PKG"
+		warning_skip_package 'launcher_write_script' "$PKG"
 		return 0
 	fi
 
@@ -538,7 +543,7 @@ launcher_write() {
 launchers_write() {
 	# skip any action if called for a package excluded for target architectures
 	if [ "$OPTION_ARCHITECTURE" != 'all' ] && [ -n "${PACKAGES_LIST##*$PKG*}" ]; then
-		skipping_pkg_warning 'launcher_write_script' "$PKG"
+		warning_skip_package 'launcher_write_script' "$PKG"
 		return 0
 	fi
 

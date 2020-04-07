@@ -282,7 +282,6 @@ pkg_set_deps_gentoo() {
 # build .tbz2 gentoo package
 # USAGE: pkg_build_gentoo $pkg_path
 # NEEDED VARS: (LANG) PLAYIT_WORKDIR
-# CALLS: pkg_print
 # CALLED BY: build_pkg
 pkg_build_gentoo() {
 	pkg_id="$(get_value "${pkg}_ID" | sed 's/-/_/g')" # This makes sure numbers in the package name doesn't get interpreted as a version by portage
@@ -298,13 +297,13 @@ pkg_build_gentoo() {
 	local pkg_filename="$PWD/$pkg_filename_base"
 
 	if [ -e "$pkg_filename" ]; then
-		pkg_build_print_already_exists "$pkg_filename_base"
+		information_package_already_exists "$pkg_filename_base"
 		eval ${pkg}_PKG=\"$pkg_filename\"
 		export ${pkg}_PKG
 		return 0
 	fi
 
-	pkg_print "$pkg_filename_base"
+	information_package_building "$pkg_filename_base"
 	if [ "$DRY_RUN" -eq 1 ]; then
 		printf '\n'
 		eval ${pkg}_PKG=\"$pkg_filename\"
