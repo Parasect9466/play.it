@@ -55,21 +55,6 @@ launcher_unity3d_run() {
 	    PULSEAUDIO_IS_AVAILABLE=0
 	fi
 
-	# Work around crash on launch related to alsa-lib
-	# cf. https://github.com/alsa-project/alsa-lib/issues/38
-	if [ $PULSEAUDIO_IS_AVAILABLE -eq 0 ]; then
-	    mkdir --parents "${APP_LIBS:=libs}"
-	    ln --force --symbolic /dev/null "$APP_LIBS/libasound.so.2"
-	else
-	    if \
-	        [ -h "${APP_LIBS:=libs}/libasound.so.2" ] && \
-	        [ "$(realpath "$APP_LIBS/libasound.so.2")" = '/dev/null' ]
-	    then
-	        rm "$APP_LIBS/libasound.so.2"
-	        rmdir --ignore-fail-on-non-empty --parents "$APP_LIBS"
-	    fi
-	fi
-
 	# Work around crash on launch related to libpulse
 	# Some Unity3D games crash on launch if libpulse-simple.so.0 is available but pulseaudio is not running
 	if [ $PULSEAUDIO_IS_AVAILABLE -eq 0 ]; then
