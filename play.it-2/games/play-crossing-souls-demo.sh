@@ -44,7 +44,7 @@ GAME_NAME='Crossing Souls Demo'
 ARCHIVE_GOG='crossing_souls_demo_en_1_1_0_18420.sh'
 ARCHIVE_GOG_URL='https://www.gog.com/game/crossing_souls_demo'
 ARCHIVE_GOG_MD5='05c1eb7a25516ae42138edb6781d8271'
-ARCHIVE_GOG_VERSION='1.1.0-gog-18420'
+ARCHIVE_GOG_VERSION='1.1.0-gog18420'
 ARCHIVE_GOG_SIZE='1100000'
 ARCHIVE_GOG_TYPE='mojosetup'
 
