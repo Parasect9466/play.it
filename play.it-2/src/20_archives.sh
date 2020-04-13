@@ -68,20 +68,30 @@ archive_set() {
 				return 0
 			fi
 		done
-		# Cache MD5 hash here to prevent it from getting ignored in a subshell
-		info_archive_hash_computation "$current_value"
-		archive_get_md5sum_computed "$name" "$current_value"
-		print_ok
-		for archive in "$@"; do
-			md5_hash="$(get_value "${archive}_MD5")"
-			if [ "$md5_hash" ] && [ "$(archive_get_md5sum_cached "$name")" = "$md5_hash" ]; then
-				archive_get_infos "$archive" "$name" "$current_value"
-				archive_check_for_extra_parts "$archive" "$name"
-				ARCHIVE="$archive"
-				export ARCHIVE
-				return 0
-			fi
-		done
+		case "$OPTION_CHECKSUM" in
+			('none')
+				# No hash to compute
+			;;
+			('md5')
+				# Cache MD5 hash here to prevent it from getting ignored in a subshell
+				info_archive_hash_computation "$current_value"
+				archive_get_md5sum_computed "$name" "$current_value"
+				print_ok
+				for archive in "$@"; do
+					md5_hash="$(get_value "${archive}_MD5")"
+					if [ "$md5_hash" ] && [ "$(archive_get_md5sum_cached "$name")" = "$md5_hash" ]; then
+						archive_get_infos "$archive" "$name" "$current_value"
+						archive_check_for_extra_parts "$archive" "$name"
+						ARCHIVE="$archive"
+						export ARCHIVE
+						return 0
+					fi
+				done
+			;;
+			(*)
+				liberror 'OPTION_CHECKSUM' 'archive_set'
+			;;
+		esac
 	else
 		for archive in "$@"; do
 			file="$(get_value "$archive")"
