@@ -35,7 +35,7 @@ set -o errexit
 # send your bug reports to contact@dotslashplay.it
 ###
 
-script_version=20200420.3
+script_version=20200420.4
 
 # Set game-specific variables
 
@@ -58,32 +58,26 @@ ARCHIVE_DOC_DATA_PATH='data/noarch/game'
 ARCHIVE_DOC_DATA_FILES='changelog.txt'
 
 ARCHIVE_GAME_BIN32_PATH='data/noarch/game'
-ARCHIVE_GAME_BIN32_FILES='Terraria.bin.x86 TerrariaServer.bin.x86 lib/libmojoshader.so'
+ARCHIVE_GAME_BIN32_FILES='lib/libmojoshader.so'
 
 ARCHIVE_GAME_BIN64_PATH='data/noarch/game'
-ARCHIVE_GAME_BIN64_FILES='Terraria.bin.x86_64 TerrariaServer.bin.x86_64 lib64/libmojoshader.so'
+ARCHIVE_GAME_BIN64_FILES='lib64/libmojoshader.so'
 
 ARCHIVE_GAME_DATA_PATH='data/noarch/game'
-ARCHIVE_GAME_DATA_FILES='Content Terraria.png monoconfig monomachineconfig open-folder *.dll *.dll.config *.exe'
+ARCHIVE_GAME_DATA_FILES='Content Terraria.png monoconfig monomachineconfig open-folder Terraria.exe TerrariaServer.exe FNA.dll FNA.dll.config'
 
-APP_MAIN_TYPE='native'
-APP_MAIN_PRERUN='# Work around terminfo Mono bug
-# cf. https://github.com/mono/mono/issues/6752
-export TERM="${TERM%-256color}"'
+APP_MAIN_TYPE='mono'
 APP_MAIN_LIBS_BIN32='lib'
 APP_MAIN_LIBS_BIN64='lib64'
-APP_MAIN_EXE_BIN32='Terraria.bin.x86'
-APP_MAIN_EXE_BIN64='Terraria.bin.x86_64'
+APP_MAIN_EXE='Terraria.exe'
 APP_MAIN_ICON='Terraria.png'
 
 APP_SERVER_ID="$GAME_ID-server"
 APP_SERVER_NAME="$GAME_NAME Server"
-APP_SERVER_TYPE='native'
-APP_SERVER_PRERUN="$APP_MAIN_PRERUN"
+APP_SERVER_TYPE='mono'
 APP_SERVER_LIBS_BIN32="$APP_MAIN_LIBS_BIN32"
 APP_SERVER_LIBS_BIN64="$APP_MAIN_LIBS_BIN64"
-APP_SERVER_EXE_BIN32='TerrariaServer.bin.x86'
-APP_SERVER_EXE_BIN64='TerrariaServer.bin.x86_64'
+APP_SERVER_EXE='TerrariaServer.exe'
 APP_SERVER_ICON='Terraria.png'
 
 PACKAGES_LIST='PKG_BIN32 PKG_BIN64 PKG_DATA'
@@ -92,14 +86,16 @@ PKG_DATA_ID="${GAME_ID}-data"
 PKG_DATA_DESCRIPTION='data'
 
 PKG_BIN32_ARCH='32'
-PKG_BIN32_DEPS="$PKG_DATA_ID glibc libstdc++ sdl2 openal glx"
+PKG_BIN32_DEPS="$PKG_DATA_ID mono sdl2 openal glx"
+PKG_BIN32_DEPS_DEB='libmono-windowsbase4.0-cil, libmono-system-windows-forms4.0-cil, libmono-system-runtime-serialization4.0-cil'
 
 PKG_BIN64_ARCH='64'
 PKG_BIN64_DEPS="$PKG_BIN32_DEPS"
+PKG_BIN64_DEPS_DEB="$PKG_BIN32_DEPS_DEB"
 
 # Load common functions
 
-target_version='2.11'
+target_version='2.12'
 
 if [ -z "$PLAYIT_LIB2" ]; then
 	: "${XDG_DATA_HOME:="$HOME/.local/share"}"
