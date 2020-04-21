@@ -34,7 +34,7 @@ set -o errexit
 # send your bug reports to contact@dotslashplay.it
 ###
 
-script_version=20200421.1
+script_version=20200421.2
 
 # Set game-specific variables
 
@@ -56,11 +56,15 @@ ARCHIVE_GAME_BIN_FILES='Breach linux_x64/libfmod.so.10 linux_x64/libfmodstudio.s
 ARCHIVE_GAME_DATA_PATH='Into the Breach Linux'
 ARCHIVE_GAME_DATA_FILES='data maps resources scripts shadersOGL'
 
-###
-# TODO
-# Add support for an optional icons pack
-# Icons can probably be extracted from the binary of Windows version
-###
+# Optional icons pack, downloadable from ./play.it server
+
+ARCHIVE_OPTIONAL_ICONS='into-the-breach_icons.tar.gz'
+ARCHIVE_OPTIONAL_ICONS_MD5='ce72ae946c4708feabb324493dc197b1'
+ARCHIVE_OPTIONAL_ICONS_URL='https://downloads.dotslashplay.it/games/into-the-breach/'
+
+ARCHIVE_ICONS_PATH='.'
+ARCHIVE_ICONS_FILES='*'
+
 APP_MAIN_TYPE='native'
 APP_MAIN_LIBS='linux_x64'
 APP_MAIN_EXE='Breach'
@@ -101,11 +105,48 @@ fi
 # shellcheck source=play.it-2/lib/libplayit2.sh
 . "$PLAYIT_LIB2"
 
+# Load optional archives
+
+###
+# TODO
+# Warning about missing optional archive should be handled by the library
+###
+ARCHIVE_MAIN="$ARCHIVE"
+set_archive 'ARCHIVE_ICONS' 'ARCHIVE_OPTIONAL_ICONS'
+ARCHIVE="$ARCHIVE_MAIN"
+if [ -z "$ARCHIVE_ICONS" ]; then
+	case "${LANG%_*}" in
+		('fr')
+			message='Lʼarchive suivante nʼayant pas été fournie, le lanceur pour ce jeu nʼutilisera pas dʼicône spécifique : %s\n'
+			message="$message"'Cette archive peut être téléchargée depuis %s\n'
+		;;
+		('en'|*)
+			message='Due to the following archive missing, the game launcher will not use a specific icon: %s\n'
+			message="$message"'This archive can be downloaded from %s\n'
+		;;
+	esac
+	print_warning
+	printf "$message" "$ARCHIVE_OPTIONAL_ICONS" "$ARCHIVE_OPTIONAL_ICONS_URL"
+	printf '\n'
+fi
+
 # Extract game data
 
 extract_data_from "$SOURCE_ARCHIVE"
 prepare_package_layout
 rm --recursive "$PLAYIT_WORKDIR/gamedata"
+
+# Include game icons
+
+if [ -n "$ARCHIVE_ICONS" ]; then
+	PKG='PKG_DATA'
+	ARCHIVE_MAIN="$ARCHIVE"
+	ARCHIVE='ARCHIVE_ICONS'
+	extract_data_from "$ARCHIVE_ICONS"
+	ARCHIVE="$ARCHIVE_MAIN"
+	organize_data 'ICONS' "$PATH_ICON_BASE"
+	rm --recursive "$PLAYIT_WORKDIR/gamedata"
+fi
 
 # Write launchers
 
