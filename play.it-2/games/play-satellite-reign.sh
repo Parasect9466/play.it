@@ -34,7 +34,7 @@ set -o errexit
 # send your bug reports to contact@dotslashplay.it
 ###
 
-script_version=20200422.1
+script_version=20200422.2
 
 # Set game-specific variables
 
@@ -71,54 +71,10 @@ ARCHIVE_GAME_BIN64_FILES='SatelliteReignLinux.x86_64 SatelliteReignLinux_Data/Mo
 ARCHIVE_GAME_DATA_PATH='data/noarch/game'
 ARCHIVE_GAME_DATA_FILES='SatelliteReignLinux_Data'
 
-DATA_DIRS='./logs'
-
-APP_MAIN_TYPE='native'
-APP_MAIN_PRERUN='# Start pulseaudio if it is available
-if command -v pulseaudio >/dev/null 2>&1; then
-	PULSEAUDIO_IS_AVAILABLE=1
-	if pulseaudio --check; then
-		KEEP_PULSEAUDIO_RUNNING=1
-	else
-		KEEP_PULSEAUDIO_RUNNING=0
-	fi
-	pulseaudio --start
-else
-	PULSEAUDIO_IS_AVAILABLE=0
-fi'
-# shellcheck disable=SC1004,SC2016
-APP_MAIN_PRERUN="$APP_MAIN_PRERUN"'
-# Work around crash on launch related to libpulse
-# Some Unity3D games crash on launch if libpulse-simple.so.0 is available but pulseaudio is not running
-if [ $PULSEAUDIO_IS_AVAILABLE -eq 0 ]; then
-	mkdir --parents "${APP_LIBS:=libs}"
-	ln --force --symbolic /dev/null "$APP_LIBS/libpulse-simple.so.0"
-else
-	if \
-		[ -h "${APP_LIBS:=libs}/libpulse-simple.so.0" ] && \
-		[ "$(realpath "$APP_LIBS/libpulse-simple.so.0")" = "/dev/null" ]
-	then
-		rm "$APP_LIBS/libpulse-simple.so.0"
-		rmdir --ignore-fail-on-non-empty --parents "$APP_LIBS"
-	fi
-fi'
-APP_MAIN_PRERUN="$APP_MAIN_PRERUN"'
-# Work around Unity3D poor support for non-US locales
-export LANG=C'
-# shellcheck disable=SC1004,SC2016
-APP_MAIN_POSTRUN='# Stop pulseaudio if it has specifically been started for the game
-if \
-	[ $PULSEAUDIO_IS_AVAILABLE -eq 1 ] && \
-	[ $KEEP_PULSEAUDIO_RUNNING -eq 0 ]
-then
-	pulseaudio --kill
-fi'
+APP_MAIN_TYPE='unity3d'
 APP_MAIN_EXE_BIN32='SatelliteReignLinux.x86'
 APP_MAIN_EXE_BIN64='SatelliteReignLinux.x86_64'
 APP_MAIN_ICON='SatelliteReignLinux_Data/Resources/UnityPlayer.png'
-# Use a per-session dedicated file for logs
-# shellcheck disable=SC2016
-APP_MAIN_OPTIONS='-logFile ./logs/$(date +%F-%R).log'
 
 PACKAGES_LIST='PKG_BIN32 PKG_BIN64 PKG_DATA'
 
