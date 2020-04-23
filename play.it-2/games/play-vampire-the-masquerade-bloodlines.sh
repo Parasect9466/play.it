@@ -34,7 +34,7 @@ set -o errexit
 # send your bug reports to vv221@dotslashplay.it
 ###
 
-script_version=20191027.1
+script_version=20200423.4
 
 # Set game-specific variables
 
@@ -117,13 +117,31 @@ CONFIG_FILES='./vampire/vidcfg.bin ./unofficial_patch/vidcfg.bin'
 DATA_DIRS='./vampire/maps/graphs ./vampire/python ./vampire/save ./unofficial_patch/maps/graphs ./unofficial_patch/python ./unofficial_patch/save'
 
 APP_MAIN_TYPE='wine'
+APP_MAIN_PRERUN='
+	# Find the keyboard layout and variant and changes it to us-azerty if it needs to be
+	KEYBOARD_LAYOUT=$(LANG=C setxkbmap -query | sed --silent "s/^layout:\\s*\\([^\\s]\\+\\)$/\\1/p")
+	RESTORE_VARIANT=0
+	if [ $KEYBOARD_LAYOUT = fr ]; then
+		KEYBOARD_VARIANT=$(LANG=C setxkbmap -query | sed --silent "s/^variant:\\s*\\([^\\s]\\+\\)$/\\1/p")
+		if [ $KEYBOARD_VARIANT != us-azerty ]; then
+			setxkbmap -variant us-azerty
+			RESTORE_VARIANT=1
+		fi
+	fi'
 APP_MAIN_EXE='vampire.exe'
+APP_MAIN_POSTRUN='
+	# Restore the keyboard variant if it has been changed earlier
+	if [ $RESTORE_VARIANT -eq 1 ]; then
+		setxkbmap -variant $KEYBOARD_VARIANT
+	fi'
 APP_MAIN_ICON='vampire.exe'
 
 APP_UP_ID="${GAME_ID}-up"
 APP_UP_TYPE='wine'
+APP_UP_PRERUN="$APP_MAIN_PRERUN"
 APP_UP_EXE='vampire.exe'
 APP_UP_OPTIONS='-game unofficial_patch'
+APP_UP_POSTRUN="$APP_MAIN_POSTRUN"
 APP_UP_ICON='vampire.exe'
 APP_UP_NAME="$GAME_NAME - Unofficial Patch"
 
