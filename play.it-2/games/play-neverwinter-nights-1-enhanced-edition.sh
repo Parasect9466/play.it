@@ -34,7 +34,7 @@ set -o errexit
 # send your bug reports to contact@dotslashplay.it
 ###
 
-script_version=20200428.8
+script_version=20200428.9
 
 # Set game-specific variables
 
@@ -122,9 +122,8 @@ ARCHIVE_DOC_L10N_PL_FILES='*.pdf *.rtf *.txt'
 ARCHIVE_GAME_L10N_DE_PATH='data/noarch/game'
 ARCHIVE_GAME_L10N_DE_FILES='lang/de/data'
 
-ARCHIVE_GAME_L10N_EN_PATH='data/noarch/game'
-ARCHIVE_GAME_L10N_EN_FILES='lang/en/data'
 # Keep compatibility with old archives
+ARCHIVE_GAME_L10N_EN_PATH_GOG_EN='data/noarch/game'
 ARCHIVE_GAME_L10N_EN_FILES_GOG_EN='data/*.tlk'
 
 ARCHIVE_GAME_L10N_ES_PATH='data/noarch/game'
@@ -142,7 +141,7 @@ ARCHIVE_GAME_L10N_PL_PATH='data/noarch/game'
 ARCHIVE_GAME_L10N_PL_FILES='lang/pl/data'
 
 ARCHIVE_GAME_DATA_PATH='data/noarch/game'
-ARCHIVE_GAME_DATA_FILES='data ovr'
+ARCHIVE_GAME_DATA_FILES='data ovr lang/en/data'
 
 APP_MAIN_TYPE='native'
 # shellcheck disable=SC2016
@@ -165,7 +164,7 @@ APP_SERVER_ICON='data/noarch/game/bin/win32/nwserver.exe'
 APP_SERVER_EXE_GOG_EN_0='bin/linux/nwserver-linux'
 APP_SERVER_EXE_GOG_FR_0='bin/linux/nwserver-linux'
 
-PACKAGES_LIST='PKG_BIN PKG_L10N_DE PKG_L10N_ES PKG_L10N_EN PKG_L10N_FR PKG_L10N_IT PKG_L10N_PL PKG_DATA'
+PACKAGES_LIST='PKG_BIN PKG_L10N_DE PKG_L10N_ES PKG_L10N_FR PKG_L10N_IT PKG_L10N_PL PKG_DATA'
 PACKAGES_LIST_GOG_EN='PKG_BIN PKG_L10N_EN PKG_DATA'
 PACKAGES_LIST_GOG_FR='PKG_BIN PKG_L10N_FR PKG_DATA'
 
@@ -199,10 +198,12 @@ PKG_L10N_PL_PROVIDE="$PKG_L10N_ID"
 PKG_L10N_PL_DESCRIPTION='Polish localization'
 
 PKG_BIN_ARCH='64'
-PKG_BIN_DEPS="$PKG_DATA_ID $PKG_L10N glibc libstdc++ glx openal"
+PKG_BIN_DEPS="$PKG_DATA_ID glibc libstdc++ glx openal"
 # Keep compatibility with old archives
 PKG_BIN_ARCH_GOG_EN='32'
 PKG_BIN_ARCH_GOG_FR='32'
+PKG_BIN_DEPS_GOG_EN="$PKG_DATA_ID $PKG_L10N_ID glibc libstdc++ glx openal"
+PKG_BIN_DEPS_GOG_FR="$PKG_DATA_ID $PKG_L10N_ID glibc libstdc++ glx openal"
 
 # Load common functions
 
@@ -330,7 +331,7 @@ case "$ARCHIVE" in
 		print_instructions 'PKG_L10N_ES' 'PKG_DATA' 'PKG_BIN'
 		# shellcheck disable=SC2059
 		printf "$message" "$lang_en"
-		print_instructions 'PKG_L10N_EN' 'PKG_DATA' 'PKG_BIN'
+		print_instructions 'PKG_DATA' 'PKG_BIN'
 		# shellcheck disable=SC2059
 		printf "$message" "$lang_fr"
 		print_instructions 'PKG_L10N_FR' 'PKG_DATA' 'PKG_BIN'
