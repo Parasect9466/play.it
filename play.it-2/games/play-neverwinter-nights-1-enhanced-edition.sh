@@ -34,7 +34,7 @@ set -o errexit
 # send your bug reports to contact@dotslashplay.it
 ###
 
-script_version=20200428.6
+script_version=20200428.7
 
 # Set game-specific variables
 
@@ -145,6 +145,10 @@ ARCHIVE_GAME_DATA_PATH='data/noarch/game'
 ARCHIVE_GAME_DATA_FILES='data ovr'
 
 APP_MAIN_TYPE='native'
+# shellcheck disable=SC2016
+APP_MAIN_PRERUN='# Run the game binary from its parent directory
+cd "$(dirname "$APP_EXE")"
+APP_EXE=$(basename "$APP_EXE")'
 APP_MAIN_EXE='bin/linux-x86/nwmain-linux'
 APP_MAIN_ICON='data/noarch/game/bin/win32/nwmain.exe'
 # Keep compatibility with old archives
@@ -154,6 +158,7 @@ APP_MAIN_EXE_GOG_FR_0='bin/linux/nwmain-linux'
 APP_SERVER_ID="${GAME_ID}_server"
 APP_SERVER_NAME="$GAME_NAME - server"
 APP_SERVER_TYPE='native'
+APP_SERVER_PRERUN="$APP_MAIN_PRERUN"
 APP_SERVER_EXE='bin/linux-x86/nwserver-linux'
 APP_SERVER_ICON='data/noarch/game/bin/win32/nwserver.exe'
 # Keep compatibility with old archives
