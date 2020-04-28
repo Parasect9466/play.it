@@ -34,7 +34,7 @@ set -o errexit
 # send your bug reports to contact@dotslashplay.it
 ###
 
-script_version=20200428.4
+script_version=20200428.5
 
 # Set game-specific variables
 
@@ -125,7 +125,7 @@ ARCHIVE_GAME_L10N_DE_FILES='lang/de/data'
 ARCHIVE_GAME_L10N_EN_PATH='data/noarch/game'
 ARCHIVE_GAME_L10N_EN_FILES='lang/en/data'
 # Keep compatibility with old archives
-ARCHIVE_GAME_L10N_EN_FILES_GOG_EN='*.tlk'
+ARCHIVE_GAME_L10N_EN_FILES_GOG_EN='data/*.tlk'
 
 ARCHIVE_GAME_L10N_ES_PATH='data/noarch/game'
 ARCHIVE_GAME_L10N_ES_FILES='lang/es/data'
@@ -133,7 +133,7 @@ ARCHIVE_GAME_L10N_ES_FILES='lang/es/data'
 ARCHIVE_GAME_L10N_FR_PATH='data/noarch/game'
 ARCHIVE_GAME_L10N_FR_FILES='lang/fr/data'
 # Keep compatibility with old archives
-ARCHIVE_GAME_L10N_FR_FILES_GOG_FR='*.tlk'
+ARCHIVE_GAME_L10N_FR_FILES_GOG_FR='data/*.tlk'
 
 ARCHIVE_GAME_L10N_IT_PATH='data/noarch/game'
 ARCHIVE_GAME_L10N_IT_FILES='lang/it/data'
