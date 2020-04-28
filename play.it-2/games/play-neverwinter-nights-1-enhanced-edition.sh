@@ -34,7 +34,7 @@ set -o errexit
 # send your bug reports to contact@dotslashplay.it
 ###
 
-script_version=20200428.2
+script_version=20200428.3
 
 # Set game-specific variables
 
@@ -155,8 +155,8 @@ APP_SERVER_NAME="$GAME_NAME - server"
 APP_SERVER_TYPE='native'
 APP_SERVER_EXE='bin/linux-x86/nwserver-linux'
 # Keep compatibility with old archives
-APP_SERVER_EXE_EN_0='bin/linux/nwserver-linux'
-APP_SERVER_EXE_FR_0='bin/linux/nwserver-linux'
+APP_SERVER_EXE_GOG_EN_0='bin/linux/nwserver-linux'
+APP_SERVER_EXE_GOG_FR_0='bin/linux/nwserver-linux'
 
 PACKAGES_LIST='PKG_BIN PKG_L10N_DE PKG_L10N_ES PKG_L10N_EN PKG_L10N_FR PKG_L10N_IT PKG_L10N_PL PKG_DATA'
 PACKAGES_LIST_GOG_EN='PKG_BIN PKG_L10N_EN PKG_DATA'
@@ -264,8 +264,8 @@ rm --recursive "$PLAYIT_WORKDIR/gamedata"
 # Write launchers
 
 PKG='PKG_BIN'
-use_archive_specific_value 'APP_MAIN'
-use_archive_specific_value 'APP_SERVER'
+use_archive_specific_value 'APP_MAIN_EXE'
+use_archive_specific_value 'APP_SERVER_EXE'
 launchers_write 'APP_MAIN' 'APP_SERVER'
 
 # Build packages
