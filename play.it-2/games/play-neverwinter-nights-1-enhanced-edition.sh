@@ -30,11 +30,11 @@ set -o errexit
 
 ###
 # Neverwinter Nights: Enhanced Edition
-# build native Linux packages from the original installers
+# build native packages from the original installers
 # send your bug reports to contact@dotslashplay.it
 ###
 
-script_version=20200428.7
+script_version=20200428.8
 
 # Set game-specific variables
 
@@ -263,13 +263,19 @@ prepare_package_layout
 
 # Get game icon
 
-###
-# TODO
-# No icon seems to be provided for some old archives
-# We could provide an optional archive including icons from other archives
-###
-PKG='PKG_DATA'
-icons_get_from_workdir 'APP_MAIN' 'APP_SERVER'
+case "$ARCHIVE" in
+	('ARCHIVE_GOG_EN_0'|'ARCHIVE_GOG_FR_0')
+		###
+		# TODO
+		# No icon seems to be provided for some old archives
+		# We could provide an optional archive including icons from other archives
+		###
+	;;
+	(*)
+		PKG='PKG_DATA'
+		icons_get_from_workdir 'APP_MAIN' 'APP_SERVER'
+	;;
+esac
 rm --recursive "$PLAYIT_WORKDIR/gamedata"
 
 # Write launchers
