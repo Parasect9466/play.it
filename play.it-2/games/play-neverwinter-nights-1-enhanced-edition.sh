@@ -34,7 +34,7 @@ set -o errexit
 # send your bug reports to contact@dotslashplay.it
 ###
 
-script_version=20200428.3
+script_version=20200428.4
 
 # Set game-specific variables
 
@@ -79,8 +79,8 @@ ARCHIVE_GOG_EN_0_TYPE='mojosetup'
 ARCHIVE_GOG_EN_0_VERSION='1.78.8186-gog25455'
 ARCHIVE_GOG_EN_0_SIZE='4700000'
 
-ARCHIVE_GOG_FR_0='neverwinter_nights_enhanced_edition_78_8186_25455.sh'
-ARCHIVE_GOG_FR_0_MD5='da5a06cc92c4e43cbd851e6df8b5bb9e'
+ARCHIVE_GOG_FR_0='neverwinter_nights_enhanced_edition_french_78_8186_25455.sh'
+ARCHIVE_GOG_FR_0_MD5='61b7d20a09288694e9930d74d335b950'
 ARCHIVE_GOG_FR_0_TYPE='mojosetup'
 ARCHIVE_GOG_FR_0_VERSION='1.78.8186-gog25455'
 ARCHIVE_GOG_FR_0_SIZE='4700000'
