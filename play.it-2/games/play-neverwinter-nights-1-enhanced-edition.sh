@@ -34,7 +34,7 @@ set -o errexit
 # send your bug reports to contact@dotslashplay.it
 ###
 
-script_version=20200428.1
+script_version=20200428.2
 
 # Set game-specific variables
 
@@ -279,6 +279,51 @@ rm --recursive "$PLAYIT_WORKDIR"
 
 # Print instructions
 
-print_instructions
+case "$ARCHIVE" in
+	('ARCHIVE_GOG_EN'*|'ARCHIVE_GOG_FR'*)
+		print_instructions
+	;;
+	(*)
+		case "${LANG%_*}" in
+			('fr')
+				message='version %s :'
+				lang_de='allemande'
+				lang_en='anglaise'
+				lang_es='espagnole'
+				lang_fr='française'
+				lang_it='italienne'
+				lang_pl='polonaise'
+			;;
+			('en'|*)
+				message='%s version:'
+				lang_de='German'
+				lang_en='English'
+				lang_es='Spanish'
+				lang_fr='French'
+				lang_it='Italian'
+				lang_pl='Polish'
+			;;
+		esac
+		printf '\n'
+		# shellcheck disable=SC2059
+		printf "$message" "$lang_de"
+		print_instructions 'PKG_L10N_DE' 'PKG_DATA' 'PKG_BIN'
+		# shellcheck disable=SC2059
+		printf "$message" "$lang_es"
+		print_instructions 'PKG_L10N_ES' 'PKG_DATA' 'PKG_BIN'
+		# shellcheck disable=SC2059
+		printf "$message" "$lang_en"
+		print_instructions 'PKG_L10N_EN' 'PKG_DATA' 'PKG_BIN'
+		# shellcheck disable=SC2059
+		printf "$message" "$lang_fr"
+		print_instructions 'PKG_L10N_FR' 'PKG_DATA' 'PKG_BIN'
+		# shellcheck disable=SC2059
+		printf "$message" "$lang_it"
+		print_instructions 'PKG_L10N_IT' 'PKG_DATA' 'PKG_BIN'
+		# shellcheck disable=SC2059
+		printf "$message" "$lang_pl"
+		print_instructions 'PKG_L10N_PL' 'PKG_DATA' 'PKG_BIN'
+	;;
+esac
 
 exit 0
