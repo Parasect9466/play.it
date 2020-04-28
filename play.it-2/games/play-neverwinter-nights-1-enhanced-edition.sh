@@ -34,7 +34,7 @@ set -o errexit
 # send your bug reports to contact@dotslashplay.it
 ###
 
-script_version=20200428.5
+script_version=20200428.6
 
 # Set game-specific variables
 
@@ -146,6 +146,7 @@ ARCHIVE_GAME_DATA_FILES='data ovr'
 
 APP_MAIN_TYPE='native'
 APP_MAIN_EXE='bin/linux-x86/nwmain-linux'
+APP_MAIN_ICON='data/noarch/game/bin/win32/nwmain.exe'
 # Keep compatibility with old archives
 APP_MAIN_EXE_GOG_EN_0='bin/linux/nwmain-linux'
 APP_MAIN_EXE_GOG_FR_0='bin/linux/nwmain-linux'
@@ -154,6 +155,7 @@ APP_SERVER_ID="${GAME_ID}_server"
 APP_SERVER_NAME="$GAME_NAME - server"
 APP_SERVER_TYPE='native'
 APP_SERVER_EXE='bin/linux-x86/nwserver-linux'
+APP_SERVER_ICON='data/noarch/game/bin/win32/nwserver.exe'
 # Keep compatibility with old archives
 APP_SERVER_EXE_GOG_EN_0='bin/linux/nwserver-linux'
 APP_SERVER_EXE_GOG_FR_0='bin/linux/nwserver-linux'
@@ -253,13 +255,17 @@ if [ -n "$ARCHIVE_L10N_FR" ]; then
 	ARCHIVE="$ARCHIVE_MAIN"
 fi
 prepare_package_layout
-rm --recursive "$PLAYIT_WORKDIR/gamedata"
+
+# Get game icon
 
 ###
 # TODO
-# No icon seems to be provided
-# One could be extracted from the Windows version and provided through an optional archive
+# No icon seems to be provided for some old archives
+# We could provide an optional archive including icons from other archives
 ###
+PKG='PKG_DATA'
+icons_get_from_workdir 'APP_MAIN' 'APP_SERVER'
+rm --recursive "$PLAYIT_WORKDIR/gamedata"
 
 # Write launchers
 
