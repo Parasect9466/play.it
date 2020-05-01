@@ -34,7 +34,7 @@ set -o errexit
 # send your bug reports to contact@dotslashplay.it
 ###
 
-script_version=20200501.1
+script_version=20200501.2
 
 # Set game-specific variables
 
@@ -126,7 +126,7 @@ fi
 
 extract_data_from "$SOURCE_ARCHIVE"
 ARCHIVE_MAIN="$ARCHIVE"
-ARCHIVE_INNER_TYPE='cabextract'
+ARCHIVE_INNER_TYPE='cabinet'
 ARCHIVE='ARCHIVE_INNER'
 extract_data_from "$PLAYIT_WORKDIR/gamedata/cab1.cab"
 rm "$PLAYIT_WORKDIR/gamedata/cab1.cab"
