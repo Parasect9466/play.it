@@ -35,7 +35,7 @@ set -o errexit
 # send your bug reports to vv221@dotslashplay.it
 ###
 
-script_version=20200502.3
+script_version=20200502.4
 
 # Set game-specific variables
 
@@ -156,7 +156,11 @@ for archive in GDX LWJGL LWJGL_NATIVES LWJGL_GLFW LWJGL_OPENAL LWJGL_OPENGL LWJG
 done
 archive_set 'ARCHIVE_LWJGL_GLFW_NATIVES' 'ARCHIVE_OPTIONAL_LWJGL_GLFW_NATIVES'
 if [ -z "$ARCHIVE_LWJGL_GLFW_NATIVES" ]; then
-	PKG_BIN_DEPS_DEB="$PKG_BIN_DEPS_DEB libglfw3 (>= 3.3)"
+	if [ -n "$PKG_BIN_DEPS_DEB" ]; then
+		PKG_BIN_DEPS_DEB="$PKG_BIN_DEPS_DEB, libglfw3 (>= 3.3)"
+	else
+		PKG_BIN_DEPS_DEB="libglfw3 (>= 3.3)"
+	fi
 	PKG_BIN_DEPS_ARCH="$PKG_BIN_DEPS_ARCH glfw>=3.3"
 	PKG_BIN_DEPS_GENTOO="$PKG_BIN_DEPS_GENTOO >=media-libs/glfw-3.3"
 fi
