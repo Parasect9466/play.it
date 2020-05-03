@@ -35,7 +35,7 @@ set -o errexit
 # send your bug reports to vv221@dotslashplay.it
 ###
 
-script_version=20200502.2
+script_version=20200502.3
 
 # Set game-specific variables
 
@@ -103,7 +103,7 @@ ARCHIVE_GAME_DATA_PATH='.'
 ARCHIVE_GAME_DATA_FILES='data'
 
 ARCHIVE_GAME0_BIN_PATH='.'
-ARCHIVE_GAME0_BIN_FILES='tf com org libsteamworks4j.so libsteam_api.so libgdx64.so linux/x64/org/lwjgl/glfw/libglfw.so linux/x64/org/lwjgl/glfw/libglfw_wayland.so linux/x64/org/lwjgl/opengl/liblwjgl_opengl.so'
+ARCHIVE_GAME0_BIN_FILES='tf com org libsteamworks4j.so libsteam_api.so libgdx64.so libgdx-freetype64.so linux/x64/org/lwjgl/glfw/libglfw.so linux/x64/org/lwjgl/glfw/libglfw_wayland.so linux/x64/org/lwjgl/opengl/liblwjgl_opengl.so'
 
 ARCHIVE_GAME1_BIN_PATH='linux/x64/org/lwjgl'
 ARCHIVE_GAME1_BIN_FILES='liblwjgl.so'
@@ -184,10 +184,12 @@ for archive in GDX LWJGL LWJGL_NATIVES LWJGL_GLFW LWJGL_OPENAL LWJGL_OPENGL LWJG
 done
 (
 	ARCHIVE='INNER_ARCHIVE'
-	INNER_ARCHIVE="$PLAYIT_WORKDIR/gamedata/gdx-natives.jar"
 	INNER_ARCHIVE_TYPE='zip'
-	extract_data_from "$INNER_ARCHIVE"
-	rm "$INNER_ARCHIVE"
+	for INNER_ARCHIVE in "$PLAYIT_WORKDIR/gamedata/gdx-natives.jar" "$PLAYIT_WORKDIR/gamedata/extensions/gdx-freetype/gdx-freetype-natives.jar"; do
+		extract_data_from "$INNER_ARCHIVE"
+		rm "$INNER_ARCHIVE"
+		[ -d "$PLAYIT_WORKDIR/gamedata/META-INF" ] && rm --recursive "$PLAYIT_WORKDIR/gamedata/META-INF"
+	done
 )
 prepare_package_layout
 rm --recursive "$PLAYIT_WORKDIR/gamedata"
