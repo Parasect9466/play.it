@@ -35,7 +35,7 @@ set -o errexit
 # send your bug reports to contact@dotslashplay.it
 ###
 
-script_version=20200503.1
+script_version=20200503.2
 
 # Set game-specific variables
 
@@ -73,6 +73,9 @@ APP_MAIN_TYPE_BIN_SHIPPED='native'
 APP_MAIN_EXE_BIN_SHIPPED='GatheringSky'
 
 PACKAGES_LIST='PKG_BIN_SHIPPED PKG_BIN_SYSTEM PKG_DATA'
+
+PKG_DATA_ID="${GAME_ID}-data"
+PKG_DATA_DESCRIPTION='data'
 
 # Common to both binaries packages
 PKG_BIN_ID="$GAME_ID"
