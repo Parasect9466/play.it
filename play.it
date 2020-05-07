@@ -61,7 +61,7 @@ SCRIPT="$(find\
 	'/usr/local/share/play.it'\
 	'/usr/share/games/play.it'\
 	'/usr/share/play.it'\
-	! -path '*/prefixes/*' -type f -name '*.sh' -exec\
+	-mindepth 1 -maxdepth 1 -type f -name '*.sh' -exec\
 	grep --regexp="ARCHIVE_.\\+='$FILE_NAME'" --files-with-matches '{}' + 2>/dev/null | head --lines=1)"
 
 # Locate script by file MD5 checksum
@@ -86,7 +86,7 @@ if [ -z "$SCRIPT" ]; then
 		'/usr/local/share/play.it'\
 		'/usr/share/games/play.it'\
 		'/usr/share/play.it'\
-		! -path '*/prefixes/*' -type f -name '*.sh' -exec\
+		-mindepth 1 -maxdepth 1 -type f -name '*.sh' -exec\
 		grep --regexp="$FILE_MD5" --files-with-matches '{}' + 2>/dev/null | head --lines=1)"
 	SCRIPT_OPTIONS='--checksum=none'
 fi
