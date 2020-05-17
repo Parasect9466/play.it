@@ -34,7 +34,7 @@ set -o errexit
 # send your bug reports to contact@dotslashplay.it
 ###
 
-script_version=20200517.2
+script_version=20200517.3
 
 # Set game-specific variables
 
@@ -65,7 +65,7 @@ ARCHIVE_GAME_BIN_JULIUS_FILES='julius'
 ARCHIVE_GAME_DATA_PATH='app'
 ARCHIVE_GAME_DATA_FILES='555 smk wavs *.555 *.emp *.eng *.map *.sg2 c3_model.txt mission1.pak'
 
-CONFIG_FILES='./caesar3.ini'
+CONFIG_FILES='./*.ini'
 DATA_FILES='./c3_model.txt ./status.txt ./*.sav'
 
 APP_WINETRICKS="vd=\$(xrandr|awk '/\\*/ {print \$1}')"
